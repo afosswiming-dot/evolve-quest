@@ -11,7 +11,7 @@ const APP_CONFIG = Object.freeze({
     session: 'evolveQuest.supabase.session.v1'
   },
   routes: {
-    login: '/cadastro/',
+    login: '/login/',
     journeySelection: '/escolha-jornada/'
   },
   autoRedirectDelay: 1500
