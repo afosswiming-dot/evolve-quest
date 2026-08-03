@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#241033" />
+  <meta name="description" content="Avaliação Inicial do Aventureiro — EVOLVE Quest" />
+  <title>EVOLVE Quest — Avaliação Inicial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar hidden" id="topbar">
+      <button class="icon-button" id="backButton" aria-label="Voltar">←</button>
+      <div class="topbar-center">
+        <span class="eyebrow">Avaliação Inicial</span>
+        <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+        <span class="progress-label" id="progressLabel">Etapa 1 de 8</span>
+      </div>
+      <button class="text-button" id="saveExitButton">Sair</button>
+    </header>
+
+    <main id="app" class="app-main"></main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <template id="introTemplate">
+    <section class="screen intro-screen">
+      <div class="brand-lockup">
+        <img src="assets/quest-logo.png" class="brand-logo" alt="EVOLVE Quest" />
+      </div>
+      <div class="hero-copy">
+        <span class="eyebrow gold">Sua jornada começa aqui</span>
+        <h1>Avaliação Inicial</h1>
+        <p>Toda grande jornada começa com um bom mapa. Suas respostas ajudarão o Healer a definir seu ponto de partida, seu Capítulo inicial e suas primeiras Missões.</p>
+      </div>
+      <div class="intro-panel">
+        <div class="intro-item"><span>01</span><p>Responda no seu ritmo</p></div>
+        <div class="intro-item"><span>02</span><p>Seu progresso é salvo automaticamente</p></div>
+        <div class="intro-item"><span>03</span><p>Você poderá editar até o início da análise</p></div>
+      </div>
+      <button class="primary-button" data-action="start">Iniciar Avaliação</button>
+      <button class="secondary-button hidden" data-action="resume">Continuar de onde parei</button>
+      <small class="privacy-note">As informações serão utilizadas exclusivamente para personalizar sua Jornada.</small>
+    </section>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
