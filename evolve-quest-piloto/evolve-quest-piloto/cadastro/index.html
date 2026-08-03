@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f2e9">
+  <meta name="description" content="Crie seu acesso de Aventureiro na EVOLVE Quest.">
+  <title>Entre para a Guilda | EVOLVE Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#cadastro-form">Ir para o formulário</a>
+
+  <main class="quest-page">
+    <div class="quest-frame" aria-hidden="true"></div>
+
+    <section class="registration" aria-labelledby="page-title">
+      <header class="quest-header">
+        <img class="quest-logo" src="assets/evolve-quest-logo.png" alt="EVOLVE Quest" width="300" height="300">
+        <div class="ornament" aria-hidden="true"><span></span><i>✦</i><span></span></div>
+        <p class="eyebrow">Sua jornada começa aqui.</p>
+        <h1 id="page-title">Entre para a Guilda</h1>
+        <p class="intro-copy">Crie seu acesso para iniciar sua jornada dentro da EVOLVE Quest.</p>
+      </header>
+
+      <div id="status-banner" class="status-banner" role="status" aria-live="polite" hidden></div>
+
+      <form id="cadastro-form" class="quest-form" novalidate>
+        <div class="field">
+          <label for="fullName">Nome completo</label>
+          <input id="fullName" name="fullName" type="text" autocomplete="name" placeholder="Digite seu nome completo" required>
+          <p class="field-error" id="fullName-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="preferredName">Nome pelo qual prefere ser chamado</label>
+          <input id="preferredName" name="preferredName" type="text" autocomplete="nickname" placeholder="Como podemos te chamar?" required>
+          <p class="field-error" id="preferredName-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="seu@email.com" required>
+          <p class="field-error" id="email-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="phone">WhatsApp com DDD</label>
+          <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(43) 99999-9999" maxlength="15" required>
+          <p class="field-error" id="phone-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="birthDate">Data de nascimento</label>
+          <input id="birthDate" name="birthDate" type="date" autocomplete="bday" required>
+          <p class="field-error" id="birthDate-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="password">Criar senha</label>
+          <div class="password-control">
+            <input id="password" name="password" type="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" minlength="8" required>
+            <button class="visibility-toggle" type="button" data-target="password" aria-label="Mostrar senha" aria-pressed="false">Mostrar</button>
+          </div>
+          <p class="field-error" id="password-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirmar senha</label>
+          <div class="password-control">
+            <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Repita sua senha" minlength="8" required>
+            <button class="visibility-toggle" type="button" data-target="confirmPassword" aria-label="Mostrar confirmação de senha" aria-pressed="false">Mostrar</button>
+          </div>
+          <p class="field-error" id="confirmPassword-error"></p>
+        </div>
+
+        <div class="terms-field">
+          <input id="terms" name="terms" type="checkbox" required>
+          <label for="terms">Li e concordo com os <a href="#termos" data-legal="terms">Termos de Uso</a> e a <a href="#privacidade" data-legal="privacy">Política de Privacidade</a>.</label>
+        </div>
+        <p class="field-error terms-error" id="terms-error"></p>
+
+        <button id="submit-button" class="quest-button" type="submit">
+          <span class="button-decoration" aria-hidden="true">✦</span>
+          <span class="button-label">Criar meu acesso</span>
+          <span class="button-spinner" aria-hidden="true"></span>
+          <span class="button-decoration" aria-hidden="true">✦</span>
+        </button>
+
+        <div class="ornament ornament--footer" aria-hidden="true"><span></span><i>✦</i><span></span></div>
+        <p class="login-copy">Já faço parte da Guilda</p>
+        <a class="secondary-link" href="/cadastro/">Entrar <span aria-hidden="true">›</span></a>
+      </form>
+    </section>
+  </main>
+
+  <dialog id="legal-dialog" class="legal-dialog" aria-labelledby="legal-title">
+    <div class="legal-dialog__header">
+      <h2 id="legal-title">Documento</h2>
+      <button id="close-dialog" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div id="legal-content" class="legal-dialog__content"></div>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
