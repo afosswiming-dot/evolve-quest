@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2b1744">
+  <meta name="description" content="Escolha de jornada e pagamento da EVOLVE Quest">
+  <title>Escolha sua Jornada — EVOLVE Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar" aria-label="Cabeçalho EVOLVE Quest">
+      <button class="icon-button" id="backButton" type="button" aria-label="Voltar" hidden>
+        <span aria-hidden="true">←</span>
+      </button>
+      <a class="brand" href="#" aria-label="EVOLVE Quest">
+        <img src="assets/quest-logo.png" alt="" width="48" height="48">
+        <span><strong>EVOLVE</strong><small>QUEST</small></span>
+      </a>
+      <div class="secure-badge" aria-label="Ambiente seguro">
+        <span aria-hidden="true">◇</span> Seguro
+      </div>
+    </header>
+
+    <main>
+      <section class="screen is-active" id="journeyScreen" aria-labelledby="journeyTitle">
+        <div class="hero">
+          <p class="eyebrow">SUA PRÓXIMA ETAPA</p>
+          <h1 id="journeyTitle">Escolha sua Jornada</h1>
+          <p>Todas as jornadas oferecem a experiência completa. O que muda é o período de compromisso com sua evolução.</p>
+        </div>
+
+        <div class="billing-note" role="note">
+          <span class="billing-note__icon" aria-hidden="true">↻</span>
+          <div><strong>Cobrança sempre mensal</strong><br><span>Nenhuma jornada cobra o período integral de uma única vez.</span></div>
+        </div>
+
+        <div class="journey-grid" id="journeyGrid" aria-label="Jornadas disponíveis"></div>
+      </section>
+
+      <section class="screen" id="summaryScreen" aria-labelledby="summaryTitle" hidden>
+        <div class="hero compact">
+          <p class="eyebrow">CONFIRME SUA ESCOLHA</p>
+          <h1 id="summaryTitle">Resumo da Jornada</h1>
+          <p>Revise as condições antes de continuar para o pagamento.</p>
+        </div>
+
+        <article class="summary-card" aria-live="polite">
+          <div class="summary-card__head">
+            <div>
+              <span class="summary-label">Jornada escolhida</span>
+              <h2 id="summaryPlan">—</h2>
+            </div>
+            <button class="text-button" id="changePlanButton" type="button">Alterar</button>
+          </div>
+
+          <dl class="summary-list">
+            <div><dt>Valor mensal</dt><dd id="summaryPrice">—</dd></div>
+            <div><dt>Duração mínima</dt><dd id="summaryDuration">—</dd></div>
+            <div><dt>Primeira cobrança</dt><dd id="summaryFirstCharge">—</dd></div>
+            <div><dt>Recorrência</dt><dd>Cobrança mensal automática</dd></div>
+            <div><dt>Cancelamento</dt><dd id="summaryCancellation">—</dd></div>
+          </dl>
+
+          <label class="consent">
+            <input type="checkbox" id="recurrenceConsent">
+            <span class="custom-check" aria-hidden="true"></span>
+            <span>Entendo que esta jornada possui cobrança recorrente mensal durante o período selecionado.</span>
+          </label>
+        </article>
+
+        <div class="payment-area">
+          <button class="primary-button" id="paymentButton" type="button" disabled>
+            <span>Continuar para o pagamento</span><span aria-hidden="true">→</span>
+          </button>
+          <p class="payment-helper">Você será direcionado ao ambiente seguro do gateway de pagamento.</p>
+        </div>
+      </section>
+
+      <section class="screen status-screen" id="statusScreen" aria-labelledby="statusTitle" hidden>
+        <div class="status-card" aria-live="assertive">
+          <div class="status-visual" id="statusVisual" aria-hidden="true"></div>
+          <p class="eyebrow" id="statusEyebrow">PAGAMENTO</p>
+          <h1 id="statusTitle">Processando pagamento</h1>
+          <p id="statusMessage">Estamos confirmando sua jornada com o gateway de pagamento.</p>
+          <button class="primary-button" id="statusAction" type="button" hidden></button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>EVOLVE Quest</span>
+      <span>O jogo termina, sua evolução não.</span>
+    </footer>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
