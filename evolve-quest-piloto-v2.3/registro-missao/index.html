@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registro da Missão — EVOLVE Quest</title><link rel="stylesheet" href="styles.css"></head>
+<body><main><div class="eyebrow">EVOLVE Quest</div><h1>Registro da Missão</h1>
+<p>O módulo oficial ainda será integrado. O <code>execution_id</code> recebido pela rota foi preservado para a próxima etapa.</p>
+<div class="status" id="execution">Execução não identificada.</div>
+<a href="/missoes/">Voltar às Missões</a></main>
+<script>const id=new URLSearchParams(location.search).get('execution_id');document.querySelector('#execution').textContent=id?'Execução: '+id:'Execução não identificada.';</script>
+</body></html>

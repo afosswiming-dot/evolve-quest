@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#24103f" />
+  <meta name="description" content="Login do Aventureiro — EVOLVE Quest" />
+  <title>Entrar na Guilda | EVOLVE Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="login-card" aria-labelledby="login-title">
+      <header class="brand-header">
+        <a href="#" class="brand" aria-label="EVOLVE Quest — Página inicial">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="brand-mark__diamond"></span>
+            <span class="brand-mark__line"></span>
+          </span>
+          <span class="brand-copy">
+            <span class="brand-copy__main">EVOLVE</span>
+            <span class="brand-copy__sub">QUEST</span>
+          </span>
+        </a>
+        <p class="brand-tagline">Sua jornada continua.</p>
+      </header>
+
+      <div class="intro">
+        <span class="eyebrow">Acesso do Aventureiro</span>
+        <h1 id="login-title">Bem-vindo de volta</h1>
+        <p>Acesse sua conta para continuar sua jornada.</p>
+      </div>
+
+      <div id="statusMessage" class="status-message" role="status" aria-live="polite" hidden></div>
+
+      <form id="loginForm" class="auth-form" novalidate>
+        <div class="field-group">
+          <label for="email">E-mail</label>
+          <div class="field-shell">
+            <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6.75h16a1 1 0 0 1 1 1v8.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.5a1 1 0 0 1 1-1Z" />
+              <path d="m4 8 8 5 8-5" />
+            </svg>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="seuemail@exemplo.com" aria-describedby="emailError" required />
+          </div>
+          <p id="emailError" class="field-error" aria-live="polite"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="password">Senha</label>
+          <div class="field-shell">
+            <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="5" y="10" width="14" height="10" rx="2" />
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+            </svg>
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" aria-describedby="passwordError" required />
+            <button id="togglePassword" class="icon-button" type="button" aria-label="Mostrar senha" aria-pressed="false">
+              <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                <circle cx="12" cy="12" r="2.5" />
+              </svg>
+              <svg class="eye-closed" viewBox="0 0 24 24" aria-hidden="true" hidden>
+                <path d="m3 3 18 18" />
+                <path d="M10.6 6.15A10.4 10.4 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.05 2.75" />
+                <path d="M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.24 3.28-.64" />
+              </svg>
+            </button>
+          </div>
+          <p id="passwordError" class="field-error" aria-live="polite"></p>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-control">
+            <input id="rememberMe" type="checkbox" />
+            <span class="checkbox-box" aria-hidden="true"></span>
+            <span>Manter conectado</span>
+          </label>
+          <button id="forgotPasswordButton" class="text-link" type="button">Esqueci minha senha</button>
+        </div>
+
+        <button id="loginButton" class="button button--primary" type="submit">
+          <span class="button-label">Entrar na Guilda</span>
+          <span class="button-spinner" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div class="divider" aria-hidden="true">
+        <span></span>
+        <p>Ainda não faz parte da Guilda?</p>
+        <span></span>
+      </div>
+
+      <a class="button button--secondary" href="/cadastro/">Criar meu cadastro</a>
+
+      <footer class="card-footer">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3 5 6v5c0 4.65 2.98 8.7 7 10 4.02-1.3 7-5.35 7-10V6l-7-3Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+        <p>Sessão protegida e acesso seguro.</p>
+      </footer>
+    </section>
+  </main>
+
+  <div id="recoveryModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <section class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
+      <button class="modal-close" type="button" data-close-modal aria-label="Fechar recuperação de senha">×</button>
+      <span class="modal-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 6.75h16a1 1 0 0 1 1 1v8.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8.5a1 1 0 0 1 1-1Z"/><path d="m4 8 8 5 8-5"/></svg>
+      </span>
+      <h2 id="recoveryTitle">Recuperar acesso</h2>
+      <p>Informe seu e-mail cadastrado. Enviaremos um link temporário caso ele esteja associado a uma conta.</p>
+      <form id="recoveryForm" novalidate>
+        <div class="field-group">
+          <label for="recoveryEmail">E-mail</label>
+          <div class="field-shell">
+            <input id="recoveryEmail" type="email" autocomplete="email" placeholder="seuemail@exemplo.com" required />
+          </div>
+          <p id="recoveryEmailError" class="field-error" aria-live="polite"></p>
+        </div>
+        <button class="button button--primary" type="submit">Enviar link temporário</button>
+      </form>
+      <div id="recoverySuccess" class="recovery-success" hidden>
+        <strong>Confira sua caixa de entrada.</strong>
+        <p>Se o e-mail estiver cadastrado, você receberá as instruções em instantes.</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
