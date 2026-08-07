@@ -1,13 +1,22 @@
-EVOLVE Quest — Jornada / Mapa de Evolução v2.6.1
+EVOLVE Quest — App Shell Unificado v2.7.1
 
-Adicionar a pasta jornada/ na raiz do repositório.
+SUBSTITUIR:
+painel-aventureiro/index.html
+missoes/index.html
 
-Arquivos:
-jornada/index.html
-jornada/styles.css
-jornada/app.js
+ADICIONAR:
+painel-aventureiro/evolve-shell.css
+missoes/evolve-shell.css
 
-Backend já criado no Supabase:
-get_my_journey_map()
+NÃO ALTERAR:
+painel-aventureiro/styles.css
+painel-aventureiro/script.js
+missoes/styles.css
+missoes/app.js
 
-A página usa dados reais da sessão autenticada.
+Objetivo:
+- topo unificado com EVOLVE Quest;
+- navegação inferior consistente;
+- mesma paleta, espaçamento, cards e feedback visual;
+- preservar toda a lógica Supabase e funcionalidades existentes;
+- Mobile First.
