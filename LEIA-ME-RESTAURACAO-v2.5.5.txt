@@ -1,0 +1,17 @@
+EVOLVE Quest — RESTAURAÇÃO COMPLETA Healer/Admin v2.5.5
+
+Este pacote substitui o patch v2.5.4.
+
+IMPORTANTE:
+- envie as pastas healer/ e admin/ COMPLETAS;
+- não envie somente os app.js;
+- os index.html, styles.css, README e demais arquivos foram restaurados;
+- os app.js já usam sessão administrativa separada;
+- o Dashboard já possui as RPCs correspondentes no Supabase.
+
+Depois do deploy:
+1. abra /healer/login/
+2. faça login como Admin
+3. abra /healer/painel/
+4. clique em Avaliações
+5. a rota /healer/avaliacoes/ não deve mais retornar 404.
