@@ -1,9 +1,0 @@
-
-:root{font-family:Inter,system-ui,sans-serif;color:#19151d;background:#f7f5f8}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}
-main{width:min(100%,440px);background:#fff;border:1px solid #e5dfea;border-radius:24px;padding:30px;box-shadow:0 18px 50px rgba(34,18,44,.08)}
-.eyebrow{font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:#6e3a86;font-weight:700}
-h1{font-family:Georgia,serif;font-size:2rem;margin:.55rem 0 1rem}p{line-height:1.6;color:#62596a}
-.status{margin:24px 0;padding:16px;border-radius:16px;background:#f2edf5;color:#4f285f}
-a,button{display:block;width:100%;border:0;border-radius:14px;padding:15px 18px;background:#351042;color:#fff;text-align:center;text-decoration:none;font-weight:700;cursor:pointer}
-.secondary{margin-top:10px;background:transparent;color:#351042;border:1px solid #d8cddd}
