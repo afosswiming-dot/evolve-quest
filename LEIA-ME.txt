@@ -1,22 +1,14 @@
-EVOLVE Quest — App Shell Unificado v2.7.1
+EVOLVE Quest — Fix REAL Healer v2.7.4
 
-SUBSTITUIR:
-painel-aventureiro/index.html
-missoes/index.html
+SUBSTITUIR SOMENTE:
+healer/aventureiros/app.js
+healer/registros/app.js
 
-ADICIONAR:
-painel-aventureiro/evolve-shell.css
-missoes/evolve-shell.css
+Validações realizadas:
+- healer/aventureiros/app.js: primeiros bytes = b"'use strict';\nconst "; node --check = OK
+- healer/registros/app.js: primeiros bytes = b"'use strict';\nconst "; node --check = OK
 
-NÃO ALTERAR:
-painel-aventureiro/styles.css
-painel-aventureiro/script.js
-missoes/styles.css
-missoes/app.js
-
-Objetivo:
-- topo unificado com EVOLVE Quest;
-- navegação inferior consistente;
-- mesma paleta, espaçamento, cards e feedback visual;
-- preservar toda a lógica Supabase e funcionalidades existentes;
-- Mobile First.
+Correções:
+- removido o prefixo literal \\n que impedia o JavaScript de executar;
+- Registros abre automaticamente registration_id quando chamado pelo Dashboard;
+- nenhuma alteração em HTML ou CSS.
