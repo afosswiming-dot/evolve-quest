@@ -1,10 +1,1 @@
-EVOLVE Quest — Patch Admin v2.5.6
-
-Substituir somente:
-healer/avaliacoes/app.js
-
-Correções:
-- /healer/avaliacoes/ passa a abrir uma fila de avaliações.
-- /healer/avaliacoes/?evaluation_id=UUID continua abrindo o detalhe.
-- Após liberar uma Jornada, o Healer volta para /healer/painel/.
-- Aventureiros, Registros, Alertas, Checkpoints e Progressão usam as RPCs já instaladas no Supabase.
+Adicionar as pastas registros/ e perfil/ na raiz do repositório. Backend Supabase já configurado.
