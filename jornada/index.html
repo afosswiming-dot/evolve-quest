@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f8f4ec">
+<title>EVOLVE Quest — Jornada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-shell">
+<header class="topbar">
+  <div class="brand">EVOLVE Quest</div>
+  <a class="back" href="/painel-aventureiro/">Painel</a>
+</header>
+
+<main class="content">
+  <section class="hero">
+    <p class="eyebrow">Mapa de Evolução</p>
+    <h1>Sua Jornada</h1>
+    <p class="lead">Cada sessão registrada deixa uma marca no caminho. Aqui você vê de onde veio, onde está e o próximo marco da sua evolução.</p>
+  </section>
+
+  <section id="status" class="status">
+    <div class="spinner" aria-hidden="true"></div>
+    Carregando seu mapa...
+  </section>
+
+  <div id="journeyContent" hidden>
+    <section class="identity-card card">
+      <div>
+        <p class="eyebrow">Aventureiro</p>
+        <h2 id="adventurerName">—</h2>
+        <p class="identity-line"><span id="className">—</span> · <span id="levelName">—</span></p>
+      </div>
+      <div class="seal" id="progressSeal">0%</div>
+    </section>
+
+    <section class="chapter-card card">
+      <p class="eyebrow">Capítulo Atual</p>
+      <h2 id="chapterTitle">—</h2>
+      <p class="lead" id="chapterObjective">—</p>
+      <div class="chapter-progress">
+        <div class="chapter-progress__top">
+          <span id="sessionsLabel">0 de 0 sessões</span>
+          <strong id="progressText">0%</strong>
+        </div>
+        <div class="progress-track"><span id="progressBar"></span></div>
+      </div>
+      <div class="chapter-stats">
+        <div><span>Frequência</span><strong id="frequency">—</strong></div>
+        <div><span>Duração</span><strong id="duration">4 semanas</strong></div>
+        <div><span>Consistência</span><strong id="streak">0</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div><p class="eyebrow">Percurso</p><h2>As 4 semanas</h2></div>
+        <span class="mini-chip" id="nextMilestone">Próximo marco</span>
+      </div>
+      <div class="map-card card">
+        <div class="map-line" aria-hidden="true"></div>
+        <div id="weekMap" class="week-map"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><p class="eyebrow">Marcos</p><h2>Conquistas</h2></div></div>
+      <div id="achievements" class="achievement-grid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><p class="eyebrow">Memória da Jornada</p><h2>Realizações recentes</h2></div></div>
+      <div id="recentRecords"></div>
+    </section>
+
+    <section class="checkpoint-card card" id="checkpointCard">
+      <div class="checkpoint-symbol">◇</div>
+      <div>
+        <p class="eyebrow">Próximo Portal</p>
+        <h2>Checkpoint</h2>
+        <p class="lead" id="checkpointText">Seu Checkpoint será liberado ao final do ciclo de quatro semanas.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+<a class="nav-item" href="/painel-aventureiro/"><strong>⌂</strong>Início</a>
+<a class="nav-item" href="/missoes/"><strong>◇</strong>Missões</a>
+<a class="nav-item active" href="/jornada/"><strong>⌁</strong>Jornada</a>
+<a class="nav-item" href="/registros/"><strong>≡</strong>Registros</a>
+<a class="nav-item" href="/perfil/"><strong>○</strong>Perfil</a>
+</nav>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+</body>
+</html>

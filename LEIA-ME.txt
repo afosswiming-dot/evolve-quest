@@ -1,1 +1,13 @@
-Adicionar as pastas registros/ e perfil/ na raiz do repositório. Backend Supabase já configurado.
+EVOLVE Quest — Jornada / Mapa de Evolução v2.6.1
+
+Adicionar a pasta jornada/ na raiz do repositório.
+
+Arquivos:
+jornada/index.html
+jornada/styles.css
+jornada/app.js
+
+Backend já criado no Supabase:
+get_my_journey_map()
+
+A página usa dados reais da sessão autenticada.
