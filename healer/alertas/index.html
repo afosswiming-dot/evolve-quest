@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alertas — EVOLVE Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./styles.css"></head>
+<body><div class="app">
+<aside class="sidebar"><div class="brand"><div class="brand-mark">EQ</div><div><strong>EVOLVE Quest</strong><span>Área administrativa</span></div></div><nav class="side-nav"><a class="" href="/healer/painel/">Dashboard</a><a class="" href="/healer/avaliacoes/">Avaliações</a><a class="" href="/healer/aventureiros/">Aventureiros</a><a class="" href="/healer/registros/">Registros</a><a class="active" href="/healer/alertas/">Alertas</a><a class="" href="/healer/checkpoints/">Checkpoints</a><a class="" href="/healer/progressao/">Progressão</a></nav><div class="side-foot">Gestão, análise e evolução.</div></aside>
+<main class="main"><header class="topbar"><div class="brand"><div class="brand-mark">EQ</div><div><strong>EVOLVE Quest</strong><span>Área administrativa</span></div></div></header>
+<div class="content">
+<section class="hero"><div><p class="eyebrow">Acompanhamento da Jornada</p><h1>Alertas</h1><p class="muted">Acompanhe a execução das Jornadas e identifique o que precisa da sua atenção.</p></div><button id="filterToggle" class="btn btn-secondary filter-toggle">Filtros</button></section>
+<nav class="tabs"><a class="tab " href="/healer/registros/">Registros</a><a class="tab active" href="/healer/alertas/">Alertas</a><a class="tab " href="/healer/checkpoints/">Checkpoints</a></nav>
+<section class="toolbar"><div class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="Buscar por Aventureiro..."></div><button id="refreshBtn" class="btn btn-secondary">Atualizar</button></section>
+<section class="metrics"><article class="metric panel"><span>Total</span><strong id="mTotal">0</strong></article><article class="metric panel"><span>Pendentes</span><strong id="mPending">0</strong></article><article class="metric panel"><span>Com atenção</span><strong id="mAttention">0</strong></article><article class="metric panel"><span>Concluídos</span><strong id="mDone">0</strong></article></section>
+<section id="filtersPanel" class="filters panel"><div class="filters-grid">
+<div class="field"><label for="periodFilter">Período</label><select id="periodFilter"><option value="">Todos</option><option value="today">Hoje</option><option value="7d">Últimos 7 dias</option><option value="30d">Últimos 30 dias</option></select></div>
+<div class="field"><label for="statusFilter">Status</label><select id="statusFilter"><option value="">Todos</option><option value="new">Novo</option><option value="in_progress">Em andamento</option><option value="resolved">Resolvido</option><option value="completed">Concluído</option></select></div>
+<div class="field"><label for="orderFilter">Ordenar</label><select id="orderFilter"><option value="priority_desc">Maior prioridade</option><option value="recent_desc">Mais recente</option><option value="oldest_asc">Mais antigo</option></select></div>
+</div></section>
+<div id="statusRegion" aria-live="polite"></div><section class="list" id="list"></section><nav class="pagination" id="pagination"></nav>
+</div></main></div>
+<nav class="bottom-nav"><a href="/healer/painel/">⌂<span>Início</span></a><a href="/healer/aventureiros/">◉<span>Aventureiros</span></a><a class="" href="/healer/registros/">▣<span>Registros</span></a><a class="active" href="/healer/alertas/">!<span>Alertas</span></a><a class="" href="/healer/checkpoints/">◇<span>Checkpoints</span></a></nav>
+<div class="detail-drawer" id="drawer"><div class="detail-card"><div class="detail-top"><div><p class="eyebrow">Alertas</p><h2 id="detailTitle">Detalhe</h2></div><button class="close" id="closeDrawer" aria-label="Fechar">×</button></div><div id="detailBody"></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./app.js"></script></body></html>
