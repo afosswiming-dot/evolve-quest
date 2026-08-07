@@ -1,0 +1,13 @@
+{
+  "project": "EVOLVE Quest",
+  "module": "Configurações Administrativas e Estrutura da Jornada",
+  "version": "v0.1",
+  "areas": [
+    "overview",
+    "classes",
+    "levels",
+    "chapters",
+    "healers",
+    "audit"
+  ]
+}
