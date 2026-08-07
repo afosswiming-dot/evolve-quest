@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#2b123d" />
+  <meta name="description" content="Tela de espera da EVOLVE Quest enquanto a Avaliação Inicial é analisada pelo Healer." />
+  <title>Sua Jornada está sendo preparada | EVOLVE Quest</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell" aria-live="polite">
+    <header class="brand" aria-label="EVOLVE Quest">
+      <div class="brand-mark" aria-hidden="true">
+        <span class="brand-mark__diamond"></span>
+      </div>
+      <div class="brand-copy">
+        <strong>EVOLVE</strong>
+        <span>QUEST</span>
+      </div>
+      <button id="logoutButton" class="icon-button" type="button" aria-label="Sair da conta" title="Sair da conta">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 5H6.8A1.8 1.8 0 0 0 5 6.8v10.4A1.8 1.8 0 0 0 6.8 19H10M15 8l4 4-4 4M19 12H9" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="content">
+      <section class="hero-card" aria-labelledby="pageTitle">
+        <div class="ornament ornament--top" aria-hidden="true"></div>
+
+        <div class="status-seal" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <path d="M32 8l6.2 12.5L52 22.5l-10 9.7 2.4 13.7L32 39.5 19.6 46 22 32.2l-10-9.7 13.8-2z" />
+          </svg>
+        </div>
+
+        <p id="greeting" class="eyebrow">Avaliação recebida</p>
+        <h1 id="pageTitle">Sua Jornada está sendo preparada</h1>
+        <p class="lead">Sua Avaliação Inicial foi recebida com sucesso.</p>
+        <p class="body-copy">
+          Agora, seu Healer irá analisar seus objetivos, histórico, rotina, experiência e limitações para definir sua Classe, Nível, Capítulo inicial e primeiras Missões.
+        </p>
+
+        <div class="live-status" role="status">
+          <span class="live-status__pulse" aria-hidden="true"></span>
+          <div>
+            <strong id="statusTitle">Análise do Healer em andamento</strong>
+            <span id="statusMessage">Você será direcionado automaticamente ao Painel do Aventureiro assim que sua Jornada for liberada.</span>
+          </div>
+        </div>
+
+        <ol class="timeline" aria-label="Progresso do primeiro acesso">
+          <li class="timeline__item is-complete">
+            <span class="timeline__marker" aria-hidden="true">✓</span>
+            <div><strong>Cadastro</strong><small>Concluído</small></div>
+          </li>
+          <li class="timeline__item is-complete">
+            <span class="timeline__marker" aria-hidden="true">✓</span>
+            <div><strong>Avaliação Inicial</strong><small>Concluída</small></div>
+          </li>
+          <li class="timeline__item is-current">
+            <span class="timeline__marker" aria-hidden="true"></span>
+            <div><strong>Análise do Healer</strong><small>Em andamento</small></div>
+          </li>
+          <li class="timeline__item">
+            <span class="timeline__marker" aria-hidden="true"></span>
+            <div><strong>Jornada liberada</strong><small>Aguardando</small></div>
+          </li>
+        </ol>
+
+        <button id="refreshButton" class="primary-button" type="button">
+          <span class="button-label">Atualizar minha Jornada</span>
+          <span class="button-spinner" aria-hidden="true"></span>
+        </button>
+
+        <button id="logoutTextButton" class="text-button" type="button">Sair da conta</button>
+
+        <div class="ornament ornament--bottom" aria-hidden="true"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>O jogo termina.</span>
+      <strong>Sua evolução não.</strong>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    window.EVOLVE_CONFIG = window.EVOLVE_CONFIG || {
+      supabaseUrl: "https://gtmngtweohixfeajljik.supabase.co",
+      supabasePublishableKey: "sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF",
+      routes: {
+        welcome: "/boas-vindas/",
+        assessment: "/avaliacao-inicial/",
+        waiting_healer: "/tela-espera/",
+        dashboard: "/painel-aventureiro/",
+        checkpoint: "/checkpoint/",
+        feedback: "/feedback-evolucao/",
+        progression: "/progressao/",
+        login: "/login/"
+      },
+      refreshIntervalMs: 60000
+    };
+  </script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

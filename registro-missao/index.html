@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2b124c" />
+  <meta name="description" content="Registro da Missão — EVOLVE Quest" />
+  <title>Registro da Missão | EVOLVE Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">EQ</div>
+      <div>
+        <p class="eyebrow">EVOLVE QUEST</p>
+        <h1>Registro da Missão</h1>
+      </div>
+      <span class="version">v1.0.1</span>
+    </header>
+
+    <section class="mission-summary" aria-label="Dados da missão">
+      <div class="summary-heading">
+        <div>
+          <p class="eyebrow">CAPÍTULO ATUAL</p>
+          <h2 id="chapterName">Capítulo II — Construindo a Base</h2>
+        </div>
+        <span class="mission-chip" id="missionName">Missão Alpha</span>
+      </div>
+
+      <div class="summary-grid">
+        <div>
+          <span>Aventureiro</span>
+          <strong id="adventurerName">Eduardo Valerio</strong>
+        </div>
+        <div>
+          <span>Data</span>
+          <strong id="missionDate">—</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="progress-panel" aria-label="Progresso do formulário">
+      <div class="progress-copy">
+        <span id="progressLabel">Etapa 1 de 4</span>
+        <span id="progressPercent">25%</span>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </section>
+
+    <form id="missionForm" novalidate>
+      <section class="form-step is-active" data-step="1">
+        <div class="step-intro">
+          <p class="eyebrow">CHECKPOINT 01</p>
+          <h2>Conclusão e intensidade</h2>
+          <p>Conte como foi completar a missão de hoje.</p>
+        </div>
+
+        <fieldset class="question-card" data-required="completion">
+          <legend>Você conseguiu concluir toda a missão?</legend>
+          <div class="segmented-options three-columns">
+            <label><input type="radio" name="completion" value="Sim" /><span>Sim</span></label>
+            <label><input type="radio" name="completion" value="Parcialmente" /><span>Parcialmente</span></label>
+            <label><input type="radio" name="completion" value="Não" /><span>Não</span></label>
+          </div>
+          <p class="field-error">Selecione uma opção.</p>
+        </fieldset>
+
+        <div class="question-card" data-required="effort">
+          <div class="question-heading">
+            <label for="effort">Como foi o esforço durante o treino?</label>
+            <output class="scale-value" id="effortOutput">5</output>
+          </div>
+          <input class="range-control" type="range" id="effort" name="effort" min="1" max="10" value="5" />
+          <div class="scale-labels"><span>Leve</span><span>Máximo</span></div>
+        </div>
+
+        <fieldset class="question-card" data-required="difficulty">
+          <legend>Como classificaria a missão?</legend>
+          <div class="stacked-options">
+            <label><input type="radio" name="difficulty" value="Muito fácil" /><span>Muito fácil</span></label>
+            <label><input type="radio" name="difficulty" value="Fácil" /><span>Fácil</span></label>
+            <label><input type="radio" name="difficulty" value="Na medida certa" /><span>Na medida certa</span></label>
+            <label><input type="radio" name="difficulty" value="Desafiadora" /><span>Desafiadora</span></label>
+            <label><input type="radio" name="difficulty" value="Épica" /><span>Épica</span></label>
+          </div>
+          <p class="field-error">Selecione uma opção.</p>
+        </fieldset>
+      </section>
+
+      <section class="form-step" data-step="2">
+        <div class="step-intro">
+          <p class="eyebrow">CHECKPOINT 02</p>
+          <h2>Técnica e sinais do corpo</h2>
+          <p>Seu feedback ajuda o Healer a ajustar sua progressão.</p>
+        </div>
+
+        <div class="question-card" data-required="technique">
+          <div class="question-heading">
+            <label for="technique">Como avalia sua execução técnica?</label>
+            <output class="scale-value" id="techniqueOutput">5</output>
+          </div>
+          <input class="range-control" type="range" id="technique" name="technique" min="1" max="10" value="5" />
+          <div class="scale-labels"><span>Precisa melhorar</span><span>Excelente</span></div>
+        </div>
+
+        <fieldset class="question-card" data-required="pain">
+          <legend>Sentiu alguma dor?</legend>
+          <div class="stacked-options">
+            <label><input type="radio" name="pain" value="Não" /><span>Não</span></label>
+            <label><input type="radio" name="pain" value="Fadiga muscular esperada" /><span>Fadiga muscular esperada</span></label>
+            <label><input type="radio" name="pain" value="Desconforto incomum" /><span>Desconforto incomum</span></label>
+            <label><input type="radio" name="pain" value="Dor articular" /><span>Dor articular</span></label>
+            <label><input type="radio" name="pain" value="Outro" /><span>Outro</span></label>
+          </div>
+          <p class="field-error">Selecione uma opção.</p>
+        </fieldset>
+
+        <div class="question-card conditional-field" id="painDetailsCard" hidden>
+          <label for="painDetails">Em qual exercício e região?</label>
+          <textarea id="painDetails" name="painDetails" rows="4" maxlength="300" placeholder="Ex.: Goblet Squat — desconforto no joelho direito."></textarea>
+          <div class="character-count"><span id="painCount">0</span>/300</div>
+          <p class="field-error">Descreva onde sentiu o desconforto.</p>
+        </div>
+      </section>
+
+      <section class="form-step" data-step="3">
+        <div class="step-intro">
+          <p class="eyebrow">CHECKPOINT 03</p>
+          <h2>Energia e resposta ao treino</h2>
+          <p>Compare como você chegou e como está agora.</p>
+        </div>
+
+        <div class="question-card">
+          <div class="question-heading">
+            <label for="energyBefore">Como estava sua energia antes da missão?</label>
+            <output class="scale-value" id="energyBeforeOutput">5</output>
+          </div>
+          <input class="range-control" type="range" id="energyBefore" name="energyBefore" min="1" max="10" value="5" />
+          <div class="scale-labels"><span>Muito baixa</span><span>Muito alta</span></div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-heading">
+            <label for="energyAfter">Como está sua energia agora?</label>
+            <output class="scale-value" id="energyAfterOutput">5</output>
+          </div>
+          <input class="range-control" type="range" id="energyAfter" name="energyAfter" min="1" max="10" value="5" />
+          <div class="scale-labels"><span>Muito baixa</span><span>Muito alta</span></div>
+        </div>
+
+        <fieldset class="question-card" data-required="feeling">
+          <legend>Como você se sente após o treino?</legend>
+          <div class="stacked-options">
+            <label><input type="radio" name="feeling" value="Muito pior" /><span>Muito pior</span></label>
+            <label><input type="radio" name="feeling" value="Um pouco pior" /><span>Um pouco pior</span></label>
+            <label><input type="radio" name="feeling" value="Igual" /><span>Igual</span></label>
+            <label><input type="radio" name="feeling" value="Melhor" /><span>Melhor</span></label>
+            <label><input type="radio" name="feeling" value="Muito melhor" /><span>Muito melhor</span></label>
+          </div>
+          <p class="field-error">Selecione uma opção.</p>
+        </fieldset>
+      </section>
+
+      <section class="form-step" data-step="4">
+        <div class="step-intro">
+          <p class="eyebrow">CHECKPOINT FINAL</p>
+          <h2>Registro livre</h2>
+          <p>Este campo é opcional e pode ser usado para qualquer detalhe importante.</p>
+        </div>
+
+        <div class="question-card">
+          <label for="notes">Gostaria de registrar alguma dificuldade, conquista ou observação?</label>
+          <textarea id="notes" name="notes" rows="7" maxlength="500" placeholder="Ex.: aumentei a carga, mantive a técnica e completei a missão sem pausas extras."></textarea>
+          <div class="character-count"><span id="notesCount">0</span>/500</div>
+        </div>
+
+        <aside class="privacy-note">
+          <span class="privacy-icon" aria-hidden="true">✓</span>
+          <p>Suas respostas serão associadas somente a esta missão e ficarão disponíveis para acompanhamento do seu Healer.</p>
+        </aside>
+      </section>
+
+      <div class="form-actions">
+        <button type="button" class="button button-secondary" id="backButton" hidden>Voltar</button>
+        <button type="button" class="button button-primary" id="nextButton">Continuar</button>
+        <button type="submit" class="button button-primary" id="submitButton" hidden>Salvar registro</button>
+      </div>
+    </form>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="success-screen" id="successScreen" hidden>
+    <div class="success-card">
+      <div class="success-symbol" aria-hidden="true">✓</div>
+      <p class="eyebrow">REGISTRO CONCLUÍDO</p>
+      <h2 id="successTitle">Missão registrada.</h2>
+      <p id="successDescription">Seu Healer recebeu suas respostas e acompanhará sua evolução.</p>
+      <div class="success-details">
+        <div><span>Progresso semanal</span><strong id="weeklyProgressResult">Atualizado</strong></div>
+        <div><span>Alerta ao Healer</span><strong id="healerAlertResult">Não necessário</strong></div>
+      </div>
+      <button class="button button-primary" id="closeSuccess">Voltar ao Painel</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
