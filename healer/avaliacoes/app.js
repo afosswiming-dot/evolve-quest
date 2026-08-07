@@ -1,0 +1,155 @@
+'use strict';
+
+const SUPABASE_URL = 'https://gtmngtweohixfeajljik.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF';
+const CONFIGURED = !SUPABASE_URL.startsWith('YOUR_') && !SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
+const db = CONFIGURED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}) : null;
+
+const $ = (id) => document.getElementById(id);
+const state = { session:null, healer:null, data:null, evaluationId:null, selectedMissions:new Set() };
+const labels = {
+  main_goal:'Objetivo principal', other_goal:'Outro objetivo', start_reason:'Motivo para começar', six_month_expectation:'Expectativa em seis meses', consistency_barriers:'Barreiras de consistência',
+  current_situation:'Situação atual', experience_time:'Tempo de experiência', modalities:'Modalidades', current_frequency:'Frequência atual', squat_confidence:'Confiança no agachamento', bench_confidence:'Confiança no supino', deadlift_confidence:'Confiança no terra', row_confidence:'Confiança na remada', pullup_confidence:'Confiança na barra fixa',
+  injuries:'Lesões', surgeries:'Cirurgias', current_pain:'Dor atual', limitations:'Limitações', medications:'Medicamentos', medical_recommendations:'Recomendações médicas', relevant_conditions:'Condições relevantes',
+  available_days:'Dias disponíveis', preferred_time:'Horário preferido', session_duration:'Duração da sessão', training_location:'Local de treino', equipment:'Equipamentos', sleep_quality:'Sono', stress_level:'Estresse', work_type:'Tipo de trabalho', sitting_time:'Tempo sentado',
+  water_intake:'Ingestão de água', food_perception:'Percepção da alimentação', alcohol:'Álcool', smoking:'Tabagismo', healer_expectation:'Expectativa sobre o Healer', additional_information:'Informação adicional', accepted_terms:'Aceite', accepted_at:'Data do aceite'
+};
+
+function evaluationIdFromUrl(){
+  const p=new URLSearchParams(location.search);
+  const explicit=p.get('evaluation_id');
+  if(explicit)return explicit;
+  const last=location.pathname.split('/').filter(Boolean).at(-1);
+  return last && last!=='avaliacoes' ? last : null;
+}
+function showView(name){['loadingView','errorView','app'].forEach(id=>$(id).classList.toggle('hidden',id!==name));}
+function error(title,message){$('errorTitle').textContent=title;$('errorMessage').textContent=message;showView('errorView');}
+function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000);}
+function value(v){if(v===null||v===undefined||v==='')return 'Não informado';if(Array.isArray(v))return v.join(', ');if(typeof v==='boolean')return v?'Sim':'Não';return String(v);}
+function age(date){if(!date)return 'Não informado';const b=new Date(date),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return `${a} anos`;}
+function dateTime(v){return v?new Intl.DateTimeFormat('pt-BR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'Não informado';}
+function initials(name='AQ'){return name.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();}
+function addAnswers(containerId,obj){const c=$(containerId);c.textContent='';Object.entries(obj||{}).filter(([k])=>!['id','evaluation_id','adventurer_id','created_at','updated_at'].includes(k)).forEach(([k,v])=>{const dl=document.createElement('dl');dl.className='answer';const dt=document.createElement('dt');dt.textContent=labels[k]||k.replaceAll('_',' ');const dd=document.createElement('dd');dd.textContent=value(v);dl.append(dt,dd);c.append(dl);});if(!c.children.length)c.textContent='Nenhuma informação disponível.';}
+
+
+function statusLabel(status){
+  return {
+    draft:'Rascunho',
+    submitted:'Aguardando análise',
+    under_analysis:'Em análise',
+    approved:'Jornada liberada',
+    returned_for_editing:'Complementação solicitada',
+    cancelled:'Cancelada'
+  }[status] || status || 'Status não informado';
+}
+
+async function loadQueue(){
+  showView('loadingView');
+  if(!CONFIGURED)return error('Integração pendente','Configure o Supabase antes de continuar.');
+  try{
+    const {data:{session}}=await db.auth.getSession();
+    if(!session){location.href='/healer/login/';return;}
+    const {data:profile,error:profileError}=await db.from('profiles')
+      .select('id,role,account_status,preferred_name,full_name')
+      .eq('id',session.user.id).single();
+    if(profileError||!profile||!['healer','admin'].includes(profile.role)||profile.account_status!=='active'){
+      await db.auth.signOut(); location.href='/healer/login/'; return;
+    }
+    state.session=session; state.healer=profile;
+    const params=new URLSearchParams(location.search);
+    const filterStatus=params.get('status')||null;
+    const {data,error:rpcError}=await db.rpc('get_healer_evaluations',{
+      p_status:filterStatus,p_search:null,p_page:1,p_page_size:50
+    });
+    if(rpcError)throw rpcError;
+    renderQueue(data||{});
+  }catch(e){
+    console.error(e);
+    error('Não foi possível carregar','Não foi possível carregar a fila de Avaliações agora.');
+  }
+}
+
+function renderQueue(data){
+  const items=Array.isArray(data)?data:(data.items||[]);
+  const summary=data.summary||{};
+  const app=$('app');
+  app.innerHTML=`
+    <header class="topbar">
+      <div>
+        <a href="/healer/painel/" class="back-link">← Dashboard</a>
+        <div class="brand-line"><strong>EVOLVE Quest</strong><span>Área administrativa</span></div>
+      </div>
+      <div class="top-actions">
+        <button id="queueRefresh" class="button button-secondary" type="button">Atualizar</button>
+        <button id="logoutButton" class="icon-button" aria-label="Sair do Painel" title="Sair">↗</button>
+      </div>
+    </header>
+    <main class="page-wrap">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">AVALIAÇÕES</p>
+          <h1>Fila de Avaliações</h1>
+          <p>Analise os envios dos Aventureiros e acompanhe o estado de cada avaliação.</p>
+        </div>
+      </section>
+      <section class="adventurer-summary">
+        <div id="summaryGrid" class="summary-grid">
+          <div class="summary-item"><span>Pendentes</span><strong>${Number(summary.pending||0)}</strong></div>
+          <div class="summary-item"><span>Liberadas</span><strong>${Number(summary.approved||0)}</strong></div>
+          <div class="summary-item"><span>Complementação</span><strong>${Number(summary.returned||0)}</strong></div>
+          <div class="summary-item"><span>Total</span><strong>${Number(data.totalCount||items.length||0)}</strong></div>
+        </div>
+      </section>
+      <section class="content-card">
+        <h2>Avaliações</h2>
+        <div id="queueList" class="answer-grid"></div>
+      </section>
+    </main>`;
+  const list=$('queueList');
+  if(!items.length){
+    list.innerHTML='<div class="answer"><dt>Tudo em ordem</dt><dd>Nenhuma avaliação encontrada para este filtro.</dd></div>';
+  }else{
+    items.forEach(item=>{
+      const wrap=document.createElement('div');
+      wrap.className='answer';
+      const name=item.adventurerName||item.fullName||'Aventureiro';
+      wrap.innerHTML=`
+        <dt>${name}</dt>
+        <dd>
+          <strong>${statusLabel(item.status)}</strong><br>
+          ${item.submittedAt ? `Enviada em ${dateTime(item.submittedAt)}` : 'Ainda não enviada'}<br><br>
+          <a class="button button-primary" href="/healer/avaliacoes/?evaluation_id=${encodeURIComponent(item.id)}">
+            ${item.status==='approved'?'Revisar avaliação':'Analisar'}
+          </a>
+        </dd>`;
+      list.append(wrap);
+    });
+  }
+  $('queueRefresh').onclick=loadQueue;
+  $('logoutButton').onclick=async()=>{await db.auth.signOut();location.href='/healer/login/';};
+  showView('app');
+}
+
+async function init(){showView('loadingView');state.evaluationId=evaluationIdFromUrl();if(!state.evaluationId)return loadQueue();if(!CONFIGURED)return error('Integração pendente','Configure SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY no arquivo app.js.');try{const {data:{session}}=await db.auth.getSession();if(!session){location.href='/healer/login/';return;}state.session=session;const {data:profile,error:profileError}=await db.from('profiles').select('id,role,account_status,preferred_name,full_name').eq('id',session.user.id).single();if(profileError||!profile||!['healer','admin'].includes(profile.role)||profile.account_status!=='active'){await db.auth.signOut();return error('Acesso negado','Este ambiente é exclusivo para Healers autorizados.');}state.healer=profile;await loadAssessment();}catch(e){console.error(e);error('Não foi possível carregar','Não foi possível concluir esta ação agora.');}}
+
+async function loadAssessment(){const {data,error:rpcError}=await db.rpc('get_assessment_for_healer',{p_evaluation_id:state.evaluationId});if(rpcError)throw rpcError;if(!data) return error('Avaliação inexistente','A Avaliação solicitada não foi encontrada ou você não possui acesso.');state.data=data;render();showView('app');}
+
+function render(){const d=state.data,p=d.profile||{},e=d.evaluation||{},review=d.review||{};const display=p.preferred_name||p.full_name||'Aventureiro';$('adventurerName').textContent=display;$('avatar').textContent=initials(display);$('adventurerMeta').textContent=`Enviada em ${dateTime(e.submitted_at)} · ${e.status||'status não informado'}`;$('statusBadge').textContent=e.status==='approved'?'Jornada liberada':e.status==='returned_for_editing'?'Aguardando complementação':'Em análise';
+  const summary=[['Nome completo',p.full_name],['Idade',age(p.birth_date)],['Local',[p.city,p.state].filter(Boolean).join(' / ')],['Altura',p.height_cm?`${p.height_cm} cm`:null],['Peso',p.weight_kg?`${p.weight_kg} kg`:null],['Healer responsável',d.assignedHealerName||state.healer.preferred_name||state.healer.full_name]];$('summaryGrid').textContent='';summary.forEach(([l,v])=>{const el=document.createElement('div');el.className='summary-item';const s=document.createElement('span');s.textContent=l;const b=document.createElement('strong');b.textContent=value(v);el.append(s,b);$('summaryGrid').append(el);});
+  addAnswers('goalsContent',d.goals);addAnswers('trainingContent',d.trainingHistory);addAnswers('healthContent',d.health);addAnswers('routineContent',d.routine);addAnswers('habitsContent',d.habits);addAnswers('commitmentContent',d.commitments);renderAttention(d);renderCatalog(d.catalog||{});fillReview(review);}
+
+function renderAttention(d){const points=[];const h=d.health||{},r=d.routine||{},hb=d.habits||{},t=d.trainingHistory||{};[['Dor atual',h.current_pain],['Lesões',h.injuries],['Cirurgias',h.surgeries],['Limitações',h.limitations],['Medicamentos',h.medications],['Recomendação médica',h.medical_recommendations],['Condições relevantes',h.relevant_conditions],['Sono',r.sleep_quality],['Estresse',r.stress_level],['Tabagismo',hb.smoking]].forEach(([l,v])=>{if(v&&String(v).toLowerCase()!=='não'&&String(v).toLowerCase()!=='nenhum')points.push(`${l}: ${value(v)}`)});['squat_confidence','bench_confidence','deadlift_confidence','row_confidence','pullup_confidence'].forEach(k=>{if(Number(t[k])>0&&Number(t[k])<=2)points.push(`Baixa ${labels[k].toLowerCase()}`)});$('attentionSection').classList.toggle('hidden',!points.length);$('attentionList').textContent='';points.forEach(x=>{const p=document.createElement('span');p.className='attention-pill';p.textContent=x;$('attentionList').append(p);});}
+
+function renderCatalog(c){const classes=c.classes||[],chapters=c.chapters||[],missions=c.missions||[];classes.forEach(x=>$('classId').add(new Option(x.name,x.id)));$('level').addEventListener('change',()=>{const level=Number($('level').value);$('chapterId').textContent='';$('chapterId').add(new Option(level?'Selecione um Capítulo':'Selecione o nível primeiro',''));chapters.filter(x=>!level||Number(x.level)===level).forEach(x=>$('chapterId').add(new Option(`Capítulo ${x.number} — ${x.title}`,x.id)));$('chapterId').disabled=!level;});
+  const container=$('missionsContainer');container.textContent='';['alpha','bravo','charlie'].forEach(type=>{const group=document.createElement('div');group.className='mission-group';const h=document.createElement('h3');h.textContent=type[0].toUpperCase()+type.slice(1);group.append(h);const list=missions.filter(m=>String(m.mission_type).toLowerCase()===type&&m.status==='published');if(!list.length){const p=document.createElement('p');p.textContent='Nenhuma Missão publicada disponível.';group.append(p);}list.forEach(m=>{const label=document.createElement('label');label.className='mission-option';const input=document.createElement('input');input.type='checkbox';input.value=m.id;input.dataset.type=type;input.addEventListener('change',()=>input.checked?state.selectedMissions.add(m.id):state.selectedMissions.delete(m.id));const span=document.createElement('span');const title=document.createElement('strong');title.textContent=`${m.name} · ${m.environment}`;const small=document.createElement('small');small.textContent=[m.subtitle,m.duration_minutes?`${m.duration_minutes} min`:null,m.exercise_count?`${m.exercise_count} exercícios`:null].filter(Boolean).join(' · ');span.append(title,small);label.append(input,span);group.append(label);});container.append(group);});}
+
+function fillReview(r){$('classId').value=r.assigned_class_id||'';$('level').value=r.assigned_level||'';$('level').dispatchEvent(new Event('change'));$('chapterId').value=r.assigned_chapter_id||'';$('frequency').value=r.recommended_frequency||'';$('restrictions').value=r.restrictions_summary||'';$('notes').value=r.healer_notes||'';$('complementary').value=r.complementary_assessment_status||'not_required';$('medical').value=r.medical_clearance_status||'not_required';(r.mission_ids||[]).forEach(id=>state.selectedMissions.add(id));document.querySelectorAll('#missionsContainer input').forEach(i=>i.checked=state.selectedMissions.has(i.value));}
+function formData(){return{evaluation_id:state.evaluationId,assigned_class_id:$('classId').value,assigned_level:Number($('level').value)||null,assigned_chapter_id:$('chapterId').value,recommended_frequency:Number($('frequency').value)||null,restrictions_summary:$('restrictions').value.trim(),healer_notes:$('notes').value.trim(),complementary_assessment_status:$('complementary').value,medical_clearance_status:$('medical').value,mission_ids:[...state.selectedMissions]};}
+async function save(){setBusy(true,'Salvando...');try{const {error}=await db.rpc('save_healer_assessment_review',{p_review:formData()});if(error)throw error;toast('Análise salva com sucesso.');}catch(e){console.error(e);$('formMessage').textContent='Não foi possível salvar a análise agora.';}finally{setBusy(false);}}
+function validateRelease(){const f=formData(),types=new Set([...document.querySelectorAll('#missionsContainer input:checked')].map(i=>i.dataset.type));if(!f.assigned_class_id||!f.assigned_level||!f.assigned_chapter_id||!f.recommended_frequency)return 'Defina Classe, Nível, Capítulo e frequência.';if(!['alpha','bravo','charlie'].every(x=>types.has(x)))return 'Selecione ao menos uma versão para Alpha, Bravo e Charlie.';if(f.medical_clearance_status==='required')return 'A liberação médica obrigatória impede a liberação da Jornada.';if(f.complementary_assessment_status==='required')return 'A avaliação complementar obrigatória impede a liberação da Jornada.';return '';}
+function reviewRelease(){const msg=validateRelease();$('formMessage').textContent=msg;if(msg)return;const f=formData(),c=$('classId').selectedOptions[0]?.textContent,ch=$('chapterId').selectedOptions[0]?.textContent;const rows=[['Aventureiro',$('adventurerName').textContent],['Classe',c],['Nível',f.assigned_level],['Capítulo',ch],['Frequência',`${f.recommended_frequency} sessões/semana`],['Missões',`${f.mission_ids.length} selecionadas`],['Restrições',f.restrictions_summary||'Nenhuma informada'],['Avaliação complementar',$('complementary').selectedOptions[0].textContent],['Liberação médica',$('medical').selectedOptions[0].textContent]];$('releaseSummary').textContent='';rows.forEach(([k,v])=>{const wrap=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;wrap.append(dt,dd);$('releaseSummary').append(wrap);});$('releaseDialog').showModal();}
+async function release(){event.preventDefault();$('confirmReleaseButton').disabled=true;$('confirmReleaseButton').textContent='Validando e liberando...';try{await save();const {data,error}=await db.rpc('release_initial_journey',{p_evaluation_id:state.evaluationId});if(error)throw error;$('releaseDialog').close();toast('Jornada liberada com sucesso.');setTimeout(()=>location.href='/healer/painel/',900);}catch(e){console.error(e);$('releaseDialog').close();$('formMessage').textContent=e.message?.includes('updated')?'Esta Avaliação foi atualizada por outro Healer. Recarregue os dados antes de continuar.':'Não foi possível concluir esta ação agora.';}finally{$('confirmReleaseButton').disabled=false;$('confirmReleaseButton').textContent='Confirmar e liberar Jornada';}}
+async function returnForEditing(e){e.preventDefault();const reason=$('returnReason').value.trim();if(!reason)return;try{const {error}=await db.rpc('return_evaluation_for_editing',{p_evaluation_id:state.evaluationId,p_reason:reason});if(error)throw error;toast('Solicitação enviada.');setTimeout(()=>location.href='/healer/avaliacoes/?status=returned',800);}catch(err){console.error(err);toast('Não foi possível enviar a solicitação.');}}
+function setBusy(b,label){[$('saveButton'),$('saveTopButton')].forEach(x=>{x.disabled=b;x.textContent=b?label:'Salvar análise';});}
+
+document.addEventListener('DOMContentLoaded',()=>{$('retryButton').onclick=init;$('saveButton').onclick=save;$('saveTopButton').onclick=save;$('reviewForm').onsubmit=e=>{e.preventDefault();reviewRelease();};$('confirmReleaseButton').onclick=release;$('returnButton').onclick=()=>$('returnDialog').showModal();$('returnForm').onsubmit=returnForEditing;document.querySelectorAll('[data-close-return]').forEach(x=>x.onclick=()=>$('returnDialog').close());$('logoutButton').onclick=async()=>{if(db)await db.auth.signOut();location.href='/healer/login/';};document.querySelectorAll('.section-nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.section-nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.target).scrollIntoView({behavior:'smooth',block:'start'});});init();});
