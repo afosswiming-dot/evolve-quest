@@ -1,0 +1,20 @@
+EVOLVE Quest — Correção sessão Healer/Admin v2.5.4
+
+Objetivo:
+- separar a sessão do Aventureiro da sessão administrativa;
+- permitir testar os dois ambientes simultaneamente no mesmo navegador;
+- impedir que o login do Healer substitua o token do Aventureiro.
+
+Storage administrativo:
+evolve-quest-healer-auth
+
+O Supabase do Dashboard também recebeu as RPCs:
+- get_healer_dashboard_summary()
+- get_healer_priority_items()
+- get_healer_recent_activity()
+
+Após publicar:
+1. saia do Painel do Healer;
+2. atualize a página;
+3. entre novamente em /healer/login/;
+4. mantenha o Aventureiro logado normalmente em outra aba.
