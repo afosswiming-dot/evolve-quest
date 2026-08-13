@@ -1,0 +1,15 @@
+EVOLVE Quest — Boas-vindas Lead v2.8.0
+
+SUBSTITUIR SOMENTE:
+boas-vindas/index.html
+
+NÃO ALTERAR:
+boas-vindas/styles.css
+boas-vindas/script.js
+
+Mudanças:
+- removida toda referência a pagamento;
+- “Pagamento confirmado” virou “Cadastro concluído”;
+- fluxo visual agora é 1 de 4:
+  Cadastro → Avaliação Inicial → Análise do Healer → Início da Jornada;
+- preservados IDs e estrutura usados pelo JavaScript.
