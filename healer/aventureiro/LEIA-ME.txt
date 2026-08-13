@@ -1,0 +1,20 @@
+EVOLVE Quest — Contato Comercial v2.8.1
+
+SUBSTITUIR SOMENTE:
+healer/aventureiro/app.js
+
+NÃO ALTERAR:
+healer/aventureiro/index.html
+healer/aventureiro/styles.css
+
+Mudanças:
+- exibe telefone do Aventureiro;
+- formata número brasileiro;
+- exibe e-mail;
+- adiciona botão Chamar no WhatsApp;
+- busca phone diretamente de profiles;
+- mantém os demais blocos do perfil administrativo.
+
+Validação:
+node --check = OK
+
