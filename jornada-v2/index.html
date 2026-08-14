@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05020a">
+<title>EVOLVE Quest — Jornada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="/painel-aventureiro/">
+      <span class="compass">✦</span>
+      <span class="brand-copy"><strong>EVOLVE</strong><b>QUEST</b></span>
+      <span class="motto">DISCIPLINA<br>CONSTRÓI<br>LIBERDADE</span>
+    </a>
+
+    <nav class="desktop-nav">
+      <a class="active" href="/jornada-v2/"><i>▦</i><span>JORNADA</span></a>
+      <a href="/missoes/"><i>⚔</i><span>MISSÕES</span></a>
+      <a href="/registros/"><i>▥</i><span>PROGRESSO</span></a>
+      <a href="#achievements"><i>♛</i><span>CONQUISTAS</span></a>
+      <a href="/perfil/"><i>●</i><span>PERFIL</span></a>
+    </nav>
+
+    <div class="header-quote">O JOGO TERMINA,<br>SUA EVOLUÇÃO NÃO.</div>
+  </header>
+
+  <main>
+    <section id="status" class="loading">
+      <div class="loader"></div>
+      <strong>CARREGANDO SUA JORNADA...</strong>
+    </section>
+
+    <div id="journeyContent" hidden>
+      <section class="journey-layout">
+        <aside class="chapter-panel panel">
+          <span class="kicker gold">CAPÍTULO <span id="chapterNumber">I</span></span>
+          <h1 id="chapterTitle">CONSTRUINDO A BASE</h1>
+          <div class="divider">◆</div>
+          <p id="chapterObjective">Cada passo te aproxima de uma versão mais forte de você.</p>
+
+          <div class="benefits">
+            <div><span>⚔</span><b>MAIS FORÇA</b></div>
+            <div><span>♡</span><b>MAIS SAÚDE</b></div>
+            <div><span>◉</span><b>MAIS DISCIPLINA</b></div>
+            <div><span>✦</span><b>MAIS LIBERDADE</b></div>
+          </div>
+
+          <div class="chapter-progress">
+            <div><span>PROGRESSO</span><strong id="progressText">0%</strong></div>
+            <div class="bar"><i id="progressBar"></i></div>
+            <small id="sessionsLabel">0 de 0 sessões</small>
+          </div>
+        </aside>
+
+        <section class="center-column">
+          <div class="map-card panel">
+            <div class="world-map">
+              <img src="assets/world-map.webp" alt="" class="world-art">
+              <div id="pathLayer" class="path-layer"></div>
+              <div id="heroMarker" class="hero-marker"></div>
+            </div>
+            <div class="map-footer">
+              <div>
+                <span class="kicker">PERCURSO</span>
+                <strong id="mapSessionsLabel">0 de 0 sessões</strong>
+              </div>
+              <div id="mapProgressDots" class="map-dots"></div>
+              <span id="nextMilestone" class="next-chip">PRÓXIMO MARCO</span>
+            </div>
+          </div>
+
+          <section class="healer-dialog">
+            <img src="assets/healer.webp" alt="Mestre Healer" class="healer-image">
+            <div class="speech panel">
+              <span class="kicker">HEALER</span>
+              <strong id="dialogTitle">Mais um passo, Aventureiro!</strong>
+              <p id="dialogText">Você está construindo algo grande.</p>
+              <span id="dialogReward" class="reward-copy"></span>
+            </div>
+          </section>
+        </section>
+
+        <aside class="right-column">
+          <section class="hero-selector panel">
+            <div class="selector-head">
+              <span class="kicker">SEU PERSONAGEM</span>
+              <button id="toggleCharacters" type="button">TROCAR</button>
+            </div>
+
+            <div class="selected-hero">
+              <div id="selectedSprite" class="sprite sprite-warrior-m"></div>
+              <div>
+                <strong id="selectedHeroName">Guerreiro</strong>
+                <span id="selectedHeroGender">Masculino</span>
+              </div>
+            </div>
+
+            <div id="characterGrid" class="character-grid" hidden></div>
+          </section>
+
+          <section class="level-panel panel">
+            <span class="level-label">NÍVEL <strong id="levelNumber">1</strong></span>
+            <div class="xp-line">
+              <span>XP</span>
+              <div class="xp-track"><i id="xpBar"></i></div>
+              <strong id="totalXp">0 XP</strong>
+            </div>
+            <div class="micro-stats">
+              <div><span>Classe</span><strong id="className">—</strong></div>
+              <div><span>Frequência</span><strong id="frequency">—</strong></div>
+              <div><span>Sequência</span><strong id="streak">0 dias</strong></div>
+            </div>
+          </section>
+
+          <section class="next-panel panel">
+            <span class="kicker">PRÓXIMO MARCO</span>
+            <div class="next-mission">
+              <strong id="nextMilestoneTitle">CONTINUE AVANÇANDO</strong>
+              <p id="nextMilestoneText">Seu próximo marco aparecerá aqui.</p>
+              <b>›</b>
+            </div>
+          </section>
+
+          <section class="recent-panel panel">
+            <span class="kicker">CONQUISTAS RECENTES</span>
+            <div id="achievementMiniList" class="mini-achievements"></div>
+          </section>
+        </aside>
+      </section>
+
+      <section id="achievements" class="collection">
+        <div class="collection-head">
+          <span class="kicker">MARCOS</span>
+          <h2>CONQUISTAS DA JORNADA</h2>
+        </div>
+        <div id="achievementGrid" class="achievement-grid"></div>
+      </section>
+
+      <section class="collection">
+        <div class="collection-head">
+          <span class="kicker">MEMÓRIA</span>
+          <h2>ÚLTIMAS MISSÕES</h2>
+        </div>
+        <div id="recentRecords" class="records"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <span>⚔ TREINE</span><span>◉ EVOLUA</span><span>♛ CONQUISTE</span><span>∞ CONTINUE</span><strong>EVOLVE · HEAL · QUEST</strong>
+  </footer>
+
+  <nav class="mobile-nav">
+    <a href="/painel-aventureiro/">⌂<small>Início</small></a>
+    <a href="/missoes/">⚔<small>Missões</small></a>
+    <a class="active" href="/jornada-v2/">▦<small>Jornada</small></a>
+    <a href="/registros/">≡<small>Registros</small></a>
+    <a href="/perfil/">●<small>Perfil</small></a>
+  </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+</body>
+</html>

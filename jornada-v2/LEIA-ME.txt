@@ -1,29 +1,25 @@
-EVOLVE Quest — Jornada 8-bit v2
+EVOLVE Quest — Jornada 8-bit v4
 
-SEGURANÇA
-- Não substitui /jornada/
-- Não altera nenhuma tabela do Supabase.
-- Lê o mesmo RPC da Jornada atual: get_my_journey_map()
-- A escolha de personagem fica somente no localStorage nesta primeira versão.
+A v4 muda a estratégia visual:
+- o mapa usa um asset real de pixel art extraído da referência;
+- o Healer usa um asset separado;
+- casas, personagem, progresso, XP e conquistas continuam dinâmicos;
+- Supabase NÃO foi alterado;
+- /jornada/ oficial NÃO foi alterada.
 
-INSTALAÇÃO
-1. No GitHub, na raiz do repositório, crie a pasta jornada-v2
-2. Envie index.html, styles.css e app.js para ela
-3. Aguarde o deploy da Vercel
-4. Teste em https://evolve-quest.vercel.app/jornada-v2/
+INSTALAÇÃO:
+Dentro de /jornada-v2/ substitua:
+index.html
+styles.css
+app.js
 
-NÃO ALTERE o link /jornada/ do menu ainda.
+E crie a pasta:
+assets/
 
-RECURSOS
-- mapa 8-bit responsivo
-- personagem anda conforme completedSessions
-- 8 personagens: guerreiro, mago, vampiro e bardo, masculino/feminino
-- escolha salva no aparelho
-- XP total, capítulo, frequência, sequência e sessões
-- conquistas e últimas missões
-- fala contextual do personagem
+Envie dentro dela:
+world-map.webp
+healer.webp
+heroes-reference.webp
 
-DEPOIS DA APROVAÇÃO
-- persistir personagem no Supabase
-- animar eventos de XP e conquistas
-- trocar o menu Jornada para /jornada-v2/
+Teste:
+https://evolve-quest.vercel.app/jornada-v2/
