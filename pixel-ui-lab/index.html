@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#09080d">
+  <title>EVOLVE Quest — Pixel UI Lab v0.2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/base.css">
+  <link rel="stylesheet" href="./styles/components.css">
+  <link rel="stylesheet" href="./styles/page.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="lab-header">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">✦</div>
+        <div>
+          <span class="pixel-text brand-name">EVOLVE QUEST</span>
+          <span class="brand-subtitle">Pixel UI Lab <strong>v0.2</strong></span>
+        </div>
+      </div>
+      <p class="lab-principle">70% aplicativo premium · 30% RPG / Pixel Art · Refinamento v0.2</p>
+    </header>
+
+    <section class="intro-card surface" aria-labelledby="intro-title">
+      <div>
+        <span class="pixel-label">LABORATÓRIO VISUAL</span>
+        <h1 id="intro-title">Acompanhamento físico com identidade de Jornada.</h1>
+        <p>
+          Componentes web reais, responsivos e reutilizáveis. O pixel aparece nos detalhes;
+          clareza, velocidade e legibilidade continuam sendo prioridade.
+        </p>
+      </div>
+      <div class="intro-orbit" aria-hidden="true"><span>◆</span></div>
+    </section>
+
+    <section class="lab-section" aria-labelledby="location-heading">
+      <div class="section-heading">
+        <div>
+          <span class="pixel-label">LOCATION TABS</span>
+          <h2 id="location-heading">Onde será sua missão?</h2>
+        </div>
+      </div>
+      <div id="locationTabs"></div>
+    </section>
+
+    <section class="lab-section" aria-labelledby="missions-heading">
+      <div class="section-heading">
+        <div>
+          <span class="pixel-label">MISSION CARD</span>
+          <h2 id="missions-heading">Missões do Capítulo</h2>
+        </div>
+        <span class="pixel-chip">CAPÍTULO I</span>
+      </div>
+      <div id="missionGrid" class="mission-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="lab-section" aria-labelledby="xp-heading">
+      <div class="section-heading">
+        <div>
+          <span class="pixel-label">XP BAR</span>
+          <h2 id="xp-heading">Progressão</h2>
+        </div>
+      </div>
+      <div id="xpBar"></div>
+    </section>
+
+    <section class="lab-section" aria-labelledby="states-heading">
+      <div class="section-heading">
+        <div>
+          <span class="pixel-label">PIXEL BADGE</span>
+          <h2 id="states-heading">Estados do sistema</h2>
+        </div>
+      </div>
+      <div id="badgeShowcase"></div>
+    </section>
+
+    <section class="lab-section" aria-labelledby="healer-heading">
+      <div class="section-heading">
+        <div>
+          <span class="pixel-label">HEALER DIALOG</span>
+          <h2 id="healer-heading">Orientação contextual</h2>
+        </div>
+      </div>
+      <div id="healerDialog"></div>
+    </section>
+
+    <section class="lab-section" aria-labelledby="buttons-heading">
+      <div class="section-heading">
+        <div>
+          <span class="pixel-label">PIXEL BUTTON</span>
+          <h2 id="buttons-heading">Ações e estados</h2>
+        </div>
+      </div>
+      <div id="buttonShowcase"></div>
+    </section>
+  </main>
+
+  <div id="modalRoot"></div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
