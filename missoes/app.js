@@ -318,7 +318,7 @@ function renderMissionDetail() {
   return `
     <section class="detail-header"><p class="eyebrow">${environmentLabel()} · ${mission.code}</p><h1>${mission.name}</h1><p class="lead">${mission.objective}</p><div class="detail-summary"><span class="summary-pill">${mission.duration}</span><span class="summary-pill">${allIds.length} exercícios</span></div></section>
     <section class="phase-list">${mission.phases.map((phase, phaseIndex) => `<article class="phase-card"><header class="phase-title"><span class="phase-number">${phaseIndex + 1}</span><h2>${phase.name}</h2></header>${phase.exercises.map(exercise => renderExercise(exercise, started)).join('')}</article>`).join('')}</section>
-    <div class="mission-controls ${started ? '' : 'full'}">${started ? `<button class="secondary-button" data-action="pause">${state.paused ? 'Retomar missão' : 'Pausar missão'}</button>` : ''}<button class="primary-button" data-action="${started ? 'finish' : 'start'}" ${started && !allDone ? 'disabled' : ''}>${started ? 'Finalizar missão' : 'Iniciar'}</button></div>`;
+    <div class="mission-controls ${started ? '' : 'full'}">${started ? `<button class="secondary-button" data-action="pause">${state.paused ? 'Retomar missão' : 'Pausar missão'}</button>` : ''}<button class="primary-button" data-action="${started ? 'finish' : 'start'}">${started ? 'Finalizar missão' : 'Iniciar'}</button></div>`;
 }
 
 function renderExercise(exercise, started) {
@@ -558,12 +558,12 @@ function handleAction(action) {
 }
 
 function updateFinishButton() {
-  const mission = activeMission();
-  const allIds = mission?.phases.flatMap(phase => phase.exercises.map(exercise => exercise.id)) || [];
   const button = document.querySelector('[data-action="finish"]');
-  if (button) button.disabled = !allIds.length || !allIds.every(id => state.completedExercises.has(id));
-}
 
+  if (button) {
+    button.disabled = false;
+  }
+}
 function setControlLoading(isLoading) {
   document.querySelectorAll('.mission-controls button').forEach(button => {
     button.disabled = isLoading || button.disabled;
