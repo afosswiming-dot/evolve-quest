@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Aventureiros — EVOLVE Quest</title>
+  <meta name="description" content="Gestão administrativa dos Aventureiros da EVOLVE Quest.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Navegação administrativa">
+    <div class="brand"><div class="brand-mark">EQ</div><div class="brand-copy"><strong>EVOLVE Quest</strong><span>Área administrativa</span></div></div>
+    <nav class="side-nav">
+      <a href="/healer/painel/">Dashboard</a><a href="/healer/avaliacoes/">Avaliações</a><a class="active" href="/healer/aventureiros/">Aventureiros</a>
+      <a href="/healer/treinos/">Treinos</a><a href="/healer/exercicios/">Biblioteca</a><a href="/healer/registros/">Registros</a><a href="/healer/alertas/">Alertas</a><a href="/healer/checkpoints/">Checkpoints</a><a href="/healer/progressao/">Progressão</a>
+    </nav>
+    <div class="side-foot">Gestão, análise e evolução.</div>
+  </aside>
+  <main class="main" id="main">
+    <header class="topbar"><div class="brand"><div class="brand-mark">EQ</div><div class="brand-copy"><strong>EVOLVE Quest</strong><span>Área administrativa</span></div></div><button class="icon-btn" id="menuBtn" aria-label="Abrir filtros">☰</button></header>
+    <div class="content">
+      <section class="hero"><div><p class="eyebrow">Gestão dos Aventureiros</p><h1>Aventureiros</h1><p class="muted">Acompanhe o estado atual de cada Jornada e identifique quem precisa da sua atenção.</p></div><button class="btn btn-secondary filter-toggle" id="filterToggle">Filtros e ordenação</button></section>
+      <section class="toolbar" aria-label="Pesquisa e filtros rápidos"><div class="search-wrap"><span class="search-icon">⌕</span><input id="searchInput" type="search" placeholder="Buscar Aventureiro..." autocomplete="off" aria-label="Buscar Aventureiro"><button id="clearSearch" class="clear-btn" aria-label="Limpar busca">×</button></div><button class="btn btn-secondary" id="refreshBtn">Atualizar</button></section>
+      <section class="summary-grid" aria-label="Resumo da operação"><article class="metric"><span>Total de Aventureiros</span><strong id="mTotal">0</strong></article><article class="metric"><span>Aventureiros ativos</span><strong id="mActive">0</strong></article><article class="metric"><span>Aguardando análise</span><strong id="mWaiting">0</strong></article><article class="metric"><span>Alertas abertos</span><strong id="mAlerts">0</strong></article><article class="metric"><span>Checkpoints próximos</span><strong id="mCheckpoints">0</strong></article><article class="metric"><span>Sem atividade recente</span><strong id="mInactive">0</strong></article></section>
+      <section class="filters panel" id="filtersPanel" aria-label="Filtros"><div class="filters-grid">
+        <div class="field"><label for="stageFilter">Estado da Jornada</label><select id="stageFilter"><option value="">Todos</option><option value="welcome">Primeiro acesso</option><option value="assessment">Avaliação em andamento</option><option value="waiting_healer">Aguardando Healer</option><option value="dashboard">Jornada ativa</option><option value="checkpoint">Checkpoint</option><option value="feedback">Feedback</option><option value="progression">Progressão</option></select></div>
+        <div class="field"><label for="statusFilter">Status da conta</label><select id="statusFilter"><option value="">Todos</option><option value="active">Ativa</option><option value="inactive">Inativa</option></select></div>
+        <div class="field"><label for="levelFilter">Nível</label><select id="levelFilter"><option value="">Todos</option><option value="1">Nível 1</option><option value="2">Nível 2</option><option value="3">Nível 3</option><option value="4">Nível 4</option><option value="5">Nível 5</option></select></div>
+        <div class="field"><label for="classFilter">Classe</label><select id="classFilter"><option value="">Todas</option></select></div>
+        <div class="field"><label for="activityFilter">Atividade</label><select id="activityFilter"><option value="">Todas</option><option value="recent">Ativo recentemente</option><option value="inactive">Sem atividade recente</option><option value="pending_registration">Registro pendente</option><option value="alert">Com alerta aberto</option><option value="checkpoint">Checkpoint próximo</option></select></div>
+        <div class="field"><label for="orderFilter">Ordenar por</label><select id="orderFilter"><option value="priority_desc">Maior prioridade</option><option value="priority_asc">Menor prioridade</option><option value="name_asc">Nome</option><option value="activity_desc">Atividade mais recente</option><option value="created_desc">Data de entrada</option><option value="progress_desc">Progresso do Capítulo</option><option value="checkpoint_asc">Próximo Checkpoint</option></select></div>
+      </div></section>
+      <section aria-labelledby="listTitle"><div class="list-head"><h2 id="listTitle">Lista de Aventureiros</h2><span class="result-count" id="resultCount">0 resultados</span></div><div id="statusRegion" aria-live="polite"></div><div class="adventurer-list" id="adventurerList"></div><nav class="pagination" id="pagination" aria-label="Paginação"></nav></section>
+    </div>
+  </main>
+</div>
+<nav class="bottom-nav" aria-label="Navegação administrativa móvel"><a href="/healer/painel/">⌂<span>Início</span></a><a href="/healer/treinos/">⚔<span>Treinos</span></a><a class="active" href="/healer/aventureiros/">◉<span>Aventureiros</span></a><a href="/healer/exercicios/">▦<span>Biblioteca</span></a><a href="/healer/mais/">•••<span>Mais</span></a></nav>
+<div id="toast" class="toast hidden" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./app.js"></script>
+</body></html>
