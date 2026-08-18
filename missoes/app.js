@@ -469,12 +469,25 @@ async function pauseOrResumeMission() {
 async function finishMission() {
   const mission = activeMission();
   if (!mission || !state.activeExecution) return;
-  const allIds = mission.phases.flatMap(phase => phase.exercises.map(exercise => exercise.id));
-  if (!allIds.length || !allIds.every(id => state.completedExercises.has(id))) {
-    showToast('Conclua todos os exercícios antes de finalizar.');
-    return;
-  }
+  const allIds = mission.phases.flatMap(
+  phase => phase.exercises.map(exercise => exercise.id)
+);
 
+const pendingExercises = allIds.filter(
+  id => !state.completedExercises.has(id)
+);
+
+if (pendingExercises.length > 0) {
+  const confirmed = window.confirm(
+    `Você ainda possui ${pendingExercises.length} exercício${
+      pendingExercises.length > 1 ? 's' : ''
+    } não concluído${
+      pendingExercises.length > 1 ? 's' : ''
+    }.\n\nDeseja encerrar a missão mesmo assim?`
+  );
+
+  if (!confirmed) return;
+}  
   setControlLoading(true);
   try {
     const now = new Date().toISOString();
