@@ -26,7 +26,19 @@ function render(){
  const items=board.filter(a=>{const n=(a.preferredName||a.fullName||'').toLowerCase();return(!q||n.includes(q))&&(!f||(f==='with'?(a.missions||[]).length:!(a.missions||[]).length))});
  $('#adventurerGrid').innerHTML=items.length?items.map(a=>`
  <article class="card">
-  <div class="card-head"><div class="who"><div class="avatar">${esc((a.preferredName||a.fullName||'A').slice(0,2).toUpperCase())}</div><div><h3>${esc(a.preferredName||a.fullName)}</h3><p>${esc(a.email||'')}</p></div></div><button class="btn primary" data-new="${a.id}">+ Novo treino</button></div>
+  <div class="card-head"><div class="who"><div class="avatar">${esc((a.preferredName||a.fullName||'A').slice(0,2).toUpperCase())}</div><div><h3>${esc(a.preferredName||a.fullName)}</h3><p>${esc(a.email||'')}</p></div></div><div style="display:flex;gap:8px;flex-wrap:wrap">
+  <button class="btn secondary" data-edit="${a.id}:${m.missionId}">
+    Editar / Personalizar
+  </button>
+
+  <button
+    class="btn secondary"
+    data-delete="${a.id}:${m.missionId}"
+    data-name="${esc(m.name || 'Missão')}"
+  >
+    Excluir
+  </button>
+</div></div>
   <div class="tags"><span class="tag">Nível ${esc(a.currentLevel||'—')}</span><span class="tag">${esc(a.chapterTitle||'Sem capítulo')}</span><span class="tag">${esc(a.prescribedFrequency||'—')}x/semana</span><span class="tag">${(a.missions||[]).length} treinos</span></div>
   <div class="missions">${(a.missions||[]).length?(a.missions||[]).map(m=>`<div class="mission"><div><strong>${esc((m.code||'').toUpperCase())} · ${esc(m.name||'Missão')}</strong><span>${esc(m.subtitle||'')} · ${m.environment==='home'?'Casa':'Academia'} · ${esc(m.exerciseCount||0)} exercícios</span></div><button class="btn secondary" data-edit="${a.id}:${m.missionId}">Editar / Personalizar</button></div>`).join(''):'<div class="empty">Nenhum treino atribuído.</div>'}</div>
  </article>`).join(''):'<div class="empty">Nenhum Aventureiro encontrado.</div>';
