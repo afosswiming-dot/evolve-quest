@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#160624"><title>CRM | EVOLVE Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head><body>
+<div class="app-shell"><aside class="sidebar">
+<a class="brand" href="/healer/painel/"><b>EVOLVE Quest</b><small>Área administrativa</small></a>
+<nav><a href="/healer/painel/">Dashboard</a><a href="/healer/avaliacoes/">Avaliações</a><a href="/healer/aventureiros/">Aventureiros</a><a href="/healer/treinos/">Treinos</a><a href="/healer/exercicios/">Biblioteca</a><a class="active" href="/healer/crm/">CRM</a><a href="/healer/registros/">Registros</a><a href="/healer/alertas/">Alertas</a><a href="/healer/checkpoints/">Checkpoints</a><a href="/healer/progressao/">Progressão</a></nav>
+</aside><main>
+<header class="topbar"><div><span class="eyebrow">COMERCIAL · RELACIONAMENTO</span><h1>CRM EVOLVE</h1><p>Organize leads, contatos, follow-ups e Aventureiros ativos.</p></div><button id="refreshBtn" class="btn secondary">Atualizar</button></header>
+<section class="metrics"><article><small>Todos</small><strong id="mAll">0</strong></article><article><small>Novos leads</small><strong id="mNew">0</strong></article><article><small>Contatados</small><strong id="mContacted">0</strong></article><article><small>Negociação</small><strong id="mNegotiation">0</strong></article><article><small>Aventureiros ativos</small><strong id="mActive">0</strong></article><article><small>Follow-ups vencidos</small><strong id="mOverdue">0</strong></article></section>
+<section class="toolbar panel"><input id="searchInput" type="search" placeholder="Buscar por nome, e-mail ou telefone..."><select id="typeFilter"><option value="">Todos</option><option value="lead">Leads</option><option value="active">Aventureiros ativos</option></select><select id="stageFilter"><option value="">Todas as etapas</option><option value="new">Novo lead</option><option value="contacted">Contatado</option><option value="payment_sent">Pagamento enviado</option><option value="negotiation">Negociação</option><option value="customer">Aventureiro ativo</option><option value="not_interested">Sem interesse</option></select></section>
+<div id="status" class="status">Carregando CRM...</div><section id="crmList" class="crm-list"></section>
+</main></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
+</body></html>
