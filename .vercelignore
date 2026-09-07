@@ -1,0 +1,9 @@
+output/
+tmp/
+supabase/
+scripts/
+*.md
+*.pdf
+*.zip
+Imagem do Codex*.png
+Slide *

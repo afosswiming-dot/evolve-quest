@@ -1,51 +1,39 @@
-# EVOLVE Quest — Progressão e Novo Capítulo v0.1
+# EVOLVE Quest — Central de Progressões
 
-Módulo administrativo para:
+Central do Healer/Admin para:
 
-- listar ciclos aguardando Feedback ou Progressão;
-- analisar o ciclo concluído;
-- registrar Feedback de Evolução;
-- decidir manutenção ou alteração de Classe, Nível e Capítulo;
-- selecionar Missões do próximo ciclo;
-- revisar e concluir a Progressão de forma transacional;
-- manter histórico e auditoria.
+- listar Aventureiros com Jornada em acompanhamento;
+- visualizar Nível, Capítulo, sessões e progresso;
+- acompanhar Checkpoint e análise existentes;
+- identificar o próximo Capítulo ativo pela ordem oficial;
+- acessar a Jornada e o fluxo administrativo protegido.
 
 ## Configuração
 
-No `app.js`, substitua:
+O navegador usa apenas a Publishable Key e mantém a sessão administrativa em
+`evolve-quest-healer-auth`.
 
-```js
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_PUBLISHABLE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
-```
-
-Use somente a Publishable Key no navegador.
-
-## RPCs esperadas
+## RPC principal
 
 - `get_healer_progressions(...)`
-- `get_progression_detail(p_progression_id uuid)`
-- `save_evolution_feedback(...)`
-- `save_progression_draft(...)`
-- `complete_journey_progression(p_progression_id uuid)`
 
-## Regra de Missões da v0.1
+A alteração efetiva de Capítulo não acontece nesta tela. O botão **Gerenciar
+Progressão** abre o perfil do Aventureiro, que reutiliza:
 
-A interface exige ao menos uma seleção antes de concluir um novo ciclo, exceto em decisões de bloqueio, pausa, avaliação complementar, liberação médica ou encerramento.
+- `get_healer_journey_management(p_adventurer_id uuid)`
+- `change_adventurer_chapter(p_adventurer_id uuid, p_new_chapter_id uuid, p_observation text)`
 
-No backend, a regra oficial deve validar ao menos uma versão válida de Alpha, Bravo e Charlie. Caso a operação exija Academia e Casa, a RPC deve exigir as seis combinações.
+## Regra de progresso
 
-## Segurança
+O percentual vem de `adventurer_journeys.chapter_progress`, calculado pelas
+sessões concluídas em `mission_registrations` sobre as sessões planejadas.
+Somente capítulos `active` participam da sequência normal.
 
-- Manter RLS ativa.
-- Validar `auth.uid()` e `is_healer_or_admin()`.
-- Healer acessa somente Aventureiros vinculados por `profiles.healer_id = auth.uid()`.
-- Admin pode gerenciar todas as Progressões.
-- Revogar execução das RPCs para `anon`.
-- Não usar Service Role no navegador.
-- Não confiar em `healer_id` ou `adventurer_id` enviados pelo frontend.
-- A operação final deve ser transacional e idempotente quando possível.
+## Segurança e limites
 
-## Limites
-
-O navegador não altera diretamente Classe, Nível, Capítulo, `journey_stage`, status da Jornada, Checkpoint ou Progressão aprovada. Essas mudanças pertencem à RPC transacional.
+- A RPC valida `auth.uid()`, `is_healer_or_admin()` e o vínculo de gestão.
+- RPCs administrativas não possuem execução para `anon`.
+- Nenhuma Service Role é exposta no navegador.
+- O navegador não altera diretamente Classe, Nível, Capítulo, `journey_stage`,
+  status da Jornada, Checkpoint ou Progressão aprovada.
+- A avaliação completa do Checkpoint continua fora deste módulo.

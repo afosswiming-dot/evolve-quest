@@ -8,6 +8,8 @@ const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHA
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 let adventurerId=null;
+let journeyManagement=null;
+let chapterChangePending=false;
 
 function fmtDate(v){
   if(!v)return'Não informado';
@@ -109,6 +111,16 @@ async function load(preloaded=null){
     return;
   }
 
+  const {data:management,error:managementError}=await supabaseClient.rpc('get_healer_journey_management',{
+    p_adventurer_id:adventurerId
+  });
+  if(managementError){
+    console.error('[EVOLVE Gerenciar Jornada]',managementError);
+    setStatus('error','Não foi possível carregar os dados de gerenciamento da Jornada.');
+    return;
+  }
+  journeyManagement=management;
+
   // A RPC retorna profiles completo (to_jsonb), incluindo phone e email.
   $('#statusRegion').innerHTML='';
   render(data);
@@ -148,6 +160,8 @@ function render(d){
         <div class="kpi"><small>Início da Jornada</small><strong>${fmtDate(j.started_at)}</strong></div>
       </div>
     </section>
+
+    ${renderJourneyManagement()}
 
     <section class="section panel">
       <div class="section-head"><h2>Contato comercial</h2></div>
@@ -208,6 +222,107 @@ function render(d){
           : '<div class="empty"><strong>Nenhum evento disponível.</strong></div>'
       }</div>
     </section>`;
+
+  bindJourneyManagement();
+}
+
+function chapterLabel(chapter){
+  if(!chapter)return'Não definido';
+  return `Capítulo ${chapter.chapterNumber??chapter.chapter_number??'—'} — ${chapter.title||'Sem título'}`;
+}
+
+function journeyStatusLabel(status){
+  return ({active:'Ativa',paused:'Pausada',locked:'Bloqueada',completed:'Concluída'})[status]||status||'Não informado';
+}
+
+function renderJourneyManagement(){
+  const management=journeyManagement||{};
+  const journey=management.journey||null;
+  const current=management.currentChapter||null;
+  const chapters=Array.isArray(management.chapters)?management.chapters:[];
+  const alternatives=chapters.filter(ch=>ch.id!==current?.id);
+
+  if(!journey){
+    return `<section class="section panel wide journey-management" data-section="journey-management">
+      <div class="section-head"><h2>Gerenciar Jornada</h2></div>
+      <div class="empty"><strong>Este Aventureiro ainda não possui uma Jornada atual.</strong></div>
+    </section>`;
+  }
+
+  return `<section class="section panel wide journey-management" data-section="journey-management">
+    <div class="section-head"><div><h2>Gerenciar Jornada</h2><p class="muted section-description">Transicione o Capítulo sem criar uma nova Jornada ou alterar o histórico do Aventureiro.</p></div></div>
+    <div class="kpi-grid journey-kpis">
+      <div class="kpi"><small>Capítulo atual</small><strong>${esc(chapterLabel(current))}</strong></div>
+      <div class="kpi"><small>Nível atual</small><strong>${journey.currentLevel?`Nível ${esc(journey.currentLevel)}`:'Não definido'}</strong></div>
+      <div class="kpi"><small>Status da Jornada</small><strong>${esc(journeyStatusLabel(journey.status))}</strong></div>
+      <div class="kpi"><small>Início do capítulo atual</small><strong>${fmtDate(journey.chapterStartedAt)}</strong></div>
+    </div>
+    <form id="chapterChangeForm" class="journey-form">
+      <div class="field">
+        <label for="newChapterId">Novo capítulo</label>
+        <select id="newChapterId" name="newChapterId" required ${alternatives.length?'':'disabled'}>
+          <option value="">${alternatives.length?'Selecione um novo capítulo':'Nenhum outro capítulo ativo disponível'}</option>
+          ${chapters.map(ch=>`<option value="${esc(ch.id)}" ${ch.id===current?.id?'disabled':''}>${esc(`Capítulo ${ch.chapter_number??'—'} — ${ch.title}${ch.id===current?.id?' (atual)':''}`)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label for="chapterObservation">Observação <span class="optional">(opcional)</span></label>
+        <textarea id="chapterObservation" name="chapterObservation" rows="3" maxlength="1000" placeholder="Contexto administrativo para esta transição"></textarea>
+      </div>
+      <div class="journey-form-footer">
+        <p class="muted form-hint">A transição preserva XP, conquistas, registros, execuções, checkpoints e a Jornada existente.</p>
+        <button class="btn btn-primary" id="changeChapterButton" type="submit" disabled>Alterar capítulo</button>
+      </div>
+    </form>
+  </section>`;
+}
+
+function bindJourneyManagement(){
+  const form=$('#chapterChangeForm');
+  const select=$('#newChapterId');
+  const button=$('#changeChapterButton');
+  if(!form||!select||!button)return;
+
+  select.addEventListener('change',()=>{
+    button.disabled=chapterChangePending||!select.value;
+  });
+
+  form.addEventListener('submit',async event=>{
+    event.preventDefault();
+    if(chapterChangePending||!select.value)return;
+
+    const current=journeyManagement?.currentChapter;
+    const target=(journeyManagement?.chapters||[]).find(ch=>ch.id===select.value);
+    if(!current||!target)return;
+
+    const confirmation=`Você está alterando o Capítulo deste Aventureiro de ${chapterLabel(current)} para ${chapterLabel(target)}.`;
+    if(!window.confirm(`${confirmation}\n\nDeseja confirmar esta transição?`))return;
+
+    chapterChangePending=true;
+    button.disabled=true;
+    button.textContent='Alterando capítulo...';
+
+    const {error}=await supabaseClient.rpc('change_adventurer_chapter',{
+      p_adventurer_id:adventurerId,
+      p_new_chapter_id:target.id,
+      p_observation:$('#chapterObservation')?.value.trim()||null
+    });
+
+    if(error){
+      console.error('[EVOLVE Alterar Capítulo]',error);
+      chapterChangePending=false;
+      button.disabled=false;
+      button.textContent='Alterar capítulo';
+      setStatus('error',error.message?.includes('CHAPTER_UNCHANGED')
+        ?'O capítulo selecionado já é o capítulo atual.'
+        :'Não foi possível alterar o Capítulo. Nenhuma informação foi modificada.');
+      return;
+    }
+
+    chapterChangePending=false;
+    await load();
+    setStatus('success',`Capítulo alterado com sucesso para ${chapterLabel(target)}.`);
+  });
 }
 
 function bindTabs(){
