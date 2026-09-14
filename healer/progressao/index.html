@@ -9,17 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
-</head>
+<link rel="stylesheet" href="/healer/shared/healer-tokens.css"><link rel="stylesheet" href="/healer/shared/healer-shell.css"></head>
 <body>
   <a class="skip-link" href="#main">Pular para o conteúdo</a>
   <div class="app-shell">
-    <aside class="sidebar" aria-label="Navegação do Healer">
-      <div class="brand"><div class="brand-mark">EQ</div><div><strong>EVOLVE Quest</strong><span>Área do Healer</span></div></div>
-      <nav class="side-nav">
-        <a href="/healer/painel/">Dashboard</a><a href="/healer/avaliacoes/">Avaliações</a><a href="/healer/aventureiros/">Aventureiros</a><a href="/healer/treinos/">Treinos</a><a href="/healer/exercicios/">Biblioteca</a><a href="/healer/registros/">Registros</a><a href="/healer/alertas/">Alertas</a><a href="/healer/checkpoints/">Checkpoints</a><a class="active" href="/healer/progressao/">Progressões</a>
-      </nav>
-      <div class="side-foot">Acompanhar. Orientar. Evoluir.</div>
-    </aside>
+    <aside class="sidebar"></aside>
     <main class="main" id="main">
       <header class="topbar"><div class="brand"><div class="brand-mark">EQ</div><div><strong>EVOLVE Quest</strong><span>Área do Healer</span></div></div></header>
       <div class="content">
@@ -53,8 +47,8 @@
       </div>
     </main>
   </div>
-  <nav class="bottom-nav" aria-label="Navegação móvel"><a href="/healer/painel/">⌂<span>Início</span></a><a href="/healer/treinos/">⚔<span>Treinos</span></a><a href="/healer/checkpoints/">◇<span>Checkpoint</span></a><a class="active" href="/healer/progressao/">↗<span>Progressões</span></a><a href="/healer/mais/">•••<span>Mais</span></a></nav>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app.js"></script>
+  <script src="/healer/shared/healer-ui.js"></script><script src="/healer/shared/healer-shell.js"></script><script src="app.js"></script><script src="/healer/shared/healer-components.js"></script>
 </body>
 </html>

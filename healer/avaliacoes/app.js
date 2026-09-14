@@ -3,7 +3,7 @@
 const SUPABASE_URL = 'https://gtmngtweohixfeajljik.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF';
 const CONFIGURED = !SUPABASE_URL.startsWith('YOUR_') && !SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
-const db = CONFIGURED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}) : null;
+const db = CONFIGURED ? window.HealerUI.client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}) : null;
 
 const $ = (id) => document.getElementById(id);
 const state = { session:null, healer:null, data:null, evaluationId:null, selectedMissions:new Set() };
@@ -24,10 +24,10 @@ function evaluationIdFromUrl(){
 }
 function showView(name){['loadingView','errorView','app'].forEach(id=>$(id).classList.toggle('hidden',id!==name));}
 function error(title,message){$('errorTitle').textContent=title;$('errorMessage').textContent=message;showView('errorView');}
-function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000);}
+function toast(message){HealerUI.toast(message)}
 function value(v){if(v===null||v===undefined||v==='')return 'Não informado';if(Array.isArray(v))return v.join(', ');if(typeof v==='boolean')return v?'Sim':'Não';return String(v);}
 function age(date){if(!date)return 'Não informado';const b=new Date(date),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return `${a} anos`;}
-function dateTime(v){return v?new Intl.DateTimeFormat('pt-BR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'Não informado';}
+function dateTime(v){return HealerUI.date(v,true)}
 function initials(name='AQ'){return name.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();}
 function addAnswers(containerId,obj){const c=$(containerId);c.textContent='';Object.entries(obj||{}).filter(([k])=>!['id','evaluation_id','adventurer_id','created_at','updated_at'].includes(k)).forEach(([k,v])=>{const dl=document.createElement('dl');dl.className='answer';const dt=document.createElement('dt');dt.textContent=labels[k]||k.replaceAll('_',' ');const dd=document.createElement('dd');dd.textContent=value(v);dl.append(dt,dd);c.append(dl);});if(!c.children.length)c.textContent='Nenhuma informação disponível.';}
 
@@ -59,7 +59,7 @@ async function loadQueue(){
     const params=new URLSearchParams(location.search);
     const filterStatus=params.get('status')||null;
     const {data,error:rpcError}=await db.rpc('get_healer_evaluations',{
-      p_status:filterStatus,p_search:null,p_page:1,p_page_size:50
+      p_status:filterStatus,p_search:params.get('search')||null,p_page:1,p_page_size:50
     });
     if(rpcError)throw rpcError;
     renderQueue(data||{});
@@ -76,7 +76,7 @@ function renderQueue(data){
   app.innerHTML=`
     <header class="topbar">
       <div>
-        <a href="/healer/painel/" class="back-link">← Dashboard</a>
+        <a href="/healer/painel/" class="back-link">← Painel</a>
         <div class="brand-line"><strong>EVOLVE Quest</strong><span>Área administrativa</span></div>
       </div>
       <div class="top-actions">
@@ -101,6 +101,8 @@ function renderQueue(data){
         </div>
       </section>
       <section class="content-card">
+        <nav class="eq-content-nav" aria-label="Status das Avaliações"><a href="?status=submitted">Aguardando análise</a><a href="?status=under_analysis">Em análise</a><a href="?status=approved">Concluídas</a><a href="?status=returned_for_editing">Devolvidas</a><a href="/healer/avaliacoes/">Todas</a></nav>
+        <form class="toolbar" action="/healer/avaliacoes/" method="get"><input type="search" name="search" aria-label="Buscar Aventureiro" placeholder="Buscar Aventureiro"><button class="btn btn-primary">Buscar</button></form>
         <h2>Avaliações</h2>
         <div id="queueList" class="answer-grid"></div>
       </section>
@@ -114,7 +116,7 @@ function renderQueue(data){
       wrap.className='answer';
       const name=item.adventurerName||item.fullName||'Aventureiro';
       wrap.innerHTML=`
-        <dt>${name}</dt>
+        <dt>${HealerUI.escape(name)}</dt>
         <dd>
           <strong>${statusLabel(item.status)}</strong><br>
           ${item.submittedAt ? `Enviada em ${dateTime(item.submittedAt)}` : 'Ainda não enviada'}<br><br>
@@ -145,10 +147,10 @@ function renderCatalog(c){const classes=c.classes||[],chapters=c.chapters||[],mi
 
 function fillReview(r){$('classId').value=r.assigned_class_id||'';$('level').value=r.assigned_level||'';$('level').dispatchEvent(new Event('change'));$('chapterId').value=r.assigned_chapter_id||'';$('frequency').value=r.recommended_frequency||'';$('restrictions').value=r.restrictions_summary||'';$('notes').value=r.healer_notes||'';$('complementary').value=r.complementary_assessment_status||'not_required';$('medical').value=r.medical_clearance_status||'not_required';(r.mission_ids||[]).forEach(id=>state.selectedMissions.add(id));document.querySelectorAll('#missionsContainer input').forEach(i=>i.checked=state.selectedMissions.has(i.value));}
 function formData(){return{evaluation_id:state.evaluationId,assigned_class_id:$('classId').value,assigned_level:Number($('level').value)||null,assigned_chapter_id:$('chapterId').value,recommended_frequency:Number($('frequency').value)||null,restrictions_summary:$('restrictions').value.trim(),healer_notes:$('notes').value.trim(),complementary_assessment_status:$('complementary').value,medical_clearance_status:$('medical').value,mission_ids:[...state.selectedMissions]};}
-async function save(){setBusy(true,'Salvando...');try{const {error}=await db.rpc('save_healer_assessment_review',{p_review:formData()});if(error)throw error;toast('Análise salva com sucesso.');}catch(e){console.error(e);$('formMessage').textContent='Não foi possível salvar a análise agora.';}finally{setBusy(false);}}
+async function save(){setBusy(true,'Salvando...');try{const {error}=await db.rpc('save_healer_assessment_review',{p_review:formData()});if(error)throw error;toast('Análise salva com sucesso.');return true;}catch(e){console.error(e);$('formMessage').textContent='Não foi possível salvar a análise agora.';return false;}finally{setBusy(false);}}
 function validateRelease(){const f=formData(),types=new Set([...document.querySelectorAll('#missionsContainer input:checked')].map(i=>i.dataset.type));if(!f.assigned_class_id||!f.assigned_level||!f.assigned_chapter_id||!f.recommended_frequency)return 'Defina Classe, Nível, Capítulo e frequência.';if(!['alpha','bravo','charlie'].every(x=>types.has(x)))return 'Selecione ao menos uma versão para Alpha, Bravo e Charlie.';if(f.medical_clearance_status==='required')return 'A liberação médica obrigatória impede a liberação da Jornada.';if(f.complementary_assessment_status==='required')return 'A avaliação complementar obrigatória impede a liberação da Jornada.';return '';}
 function reviewRelease(){const msg=validateRelease();$('formMessage').textContent=msg;if(msg)return;const f=formData(),c=$('classId').selectedOptions[0]?.textContent,ch=$('chapterId').selectedOptions[0]?.textContent;const rows=[['Aventureiro',$('adventurerName').textContent],['Classe',c],['Nível',f.assigned_level],['Capítulo',ch],['Frequência',`${f.recommended_frequency} sessões/semana`],['Missões',`${f.mission_ids.length} selecionadas`],['Restrições',f.restrictions_summary||'Nenhuma informada'],['Avaliação complementar',$('complementary').selectedOptions[0].textContent],['Liberação médica',$('medical').selectedOptions[0].textContent]];$('releaseSummary').textContent='';rows.forEach(([k,v])=>{const wrap=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;wrap.append(dt,dd);$('releaseSummary').append(wrap);});$('releaseDialog').showModal();}
-async function release(){event.preventDefault();$('confirmReleaseButton').disabled=true;$('confirmReleaseButton').textContent='Validando e liberando...';try{await save();const {data,error}=await db.rpc('release_initial_journey',{p_evaluation_id:state.evaluationId});if(error)throw error;$('releaseDialog').close();toast('Jornada liberada com sucesso.');setTimeout(()=>location.href='/healer/painel/',900);}catch(e){console.error(e);$('releaseDialog').close();$('formMessage').textContent=e.message?.includes('updated')?'Esta Avaliação foi atualizada por outro Healer. Recarregue os dados antes de continuar.':'Não foi possível concluir esta ação agora.';}finally{$('confirmReleaseButton').disabled=false;$('confirmReleaseButton').textContent='Confirmar e liberar Jornada';}}
+async function release(event){event.preventDefault();$('confirmReleaseButton').disabled=true;$('confirmReleaseButton').textContent='Validando e liberando...';try{if(!(await save())){$('releaseDialog').close();toast('Não foi possível salvar a análise. Tente novamente antes de liberar a Jornada.');return;}const {data,error}=await db.rpc('release_initial_journey',{p_evaluation_id:state.evaluationId});if(error)throw error;$('releaseDialog').close();toast('Jornada liberada com sucesso.');setTimeout(()=>location.href='/healer/painel/',900);}catch(e){console.error(e);$('releaseDialog').close();$('formMessage').textContent=e.message?.includes('updated')?'Esta Avaliação foi atualizada por outro Healer. Recarregue os dados antes de continuar.':'Não foi possível concluir esta ação agora.';}finally{$('confirmReleaseButton').disabled=false;$('confirmReleaseButton').textContent='Confirmar e liberar Jornada';}}
 async function returnForEditing(e){e.preventDefault();const reason=$('returnReason').value.trim();if(!reason)return;try{const {error}=await db.rpc('return_evaluation_for_editing',{p_evaluation_id:state.evaluationId,p_reason:reason});if(error)throw error;toast('Solicitação enviada.');setTimeout(()=>location.href='/healer/avaliacoes/?status=returned',800);}catch(err){console.error(err);toast('Não foi possível enviar a solicitação.');}}
 function setBusy(b,label){[$('saveButton'),$('saveTopButton')].forEach(x=>{x.disabled=b;x.textContent=b?label:'Salvar análise';});}
 

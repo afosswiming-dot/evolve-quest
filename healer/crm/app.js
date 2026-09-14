@@ -1,6 +1,6 @@
 "use strict";
 
-const db = window.supabase.createClient(
+const db = window.HealerUI.client(
   "https://gtmngtweohixfeajljik.supabase.co",
   "sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF",
   {
@@ -29,12 +29,12 @@ const esc = v =>
   );
 
 const STAGES = {
-  new: "Novo lead",
+  new: "Novo",
   contacted: "Contatado",
   payment_sent: "Pagamento enviado",
   negotiation: "Negociação",
   customer: "Aventureiro ativo",
-  not_interested: "Sem interesse"
+  not_interested: "Perdido"
 };
 
 const ACTIVE_STAGES = [
@@ -278,7 +278,7 @@ function render() {
   $("#crmList").innerHTML = filtered.map(card).join("");
 
   document.querySelectorAll("[data-save]").forEach(
-    b => (b.onclick = () => save(b.dataset.save))
+    b => (b.onclick = HealerUI.action(b, () => save(b.dataset.save)))
   );
 }
 
@@ -477,7 +477,7 @@ async function save(id) {
 
   if (error) {
     console.error("[EVOLVE CRM]", error);
-    state.textContent = "Erro ao salvar";
+    state.textContent = "Não foi possível salvar. Tente novamente.";
     state.className = "save-state error";
     return;
   }

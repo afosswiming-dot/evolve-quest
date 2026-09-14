@@ -7,23 +7,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
-</head>
+<link rel="stylesheet" href="/healer/shared/healer-tokens.css"><link rel="stylesheet" href="/healer/shared/healer-shell.css"></head>
 <body>
 <a class="skip-link" href="#main">Pular para o conteúdo</a>
 <div class="app-shell">
-  <aside class="sidebar" aria-label="Navegação administrativa">
-    <div class="brand"><div class="brand-mark">EQ</div><div class="brand-copy"><strong>EVOLVE Quest</strong><span>Área administrativa</span></div></div>
-    <nav class="side-nav">
-      <a href="/healer/painel/">Dashboard</a><a href="/healer/avaliacoes/">Avaliações</a><a class="active" href="/healer/aventureiros/">Aventureiros</a>
-      <a href="/healer/treinos/">Treinos</a><a href="/healer/exercicios/">Biblioteca</a><a href="/healer/registros/">Registros</a><a href="/healer/alertas/">Alertas</a><a href="/healer/checkpoints/">Checkpoints</a><a href="/healer/progressao/">Progressão</a>
-    </nav>
-    <div class="side-foot">Gestão, análise e evolução.</div>
-  </aside>
+  <aside class="sidebar"></aside>
   <main class="main" id="main">
     <header class="topbar"><div class="brand"><div class="brand-mark">EQ</div><div class="brand-copy"><strong>EVOLVE Quest</strong><span>Área administrativa</span></div></div><button class="icon-btn" id="menuBtn" aria-label="Abrir filtros">☰</button></header>
     <div class="content">
-      <section class="hero"><div><p class="eyebrow">Gestão dos Aventureiros</p><h1>Aventureiros</h1><p class="muted">Acompanhe o estado atual de cada Jornada e identifique quem precisa da sua atenção.</p></div><button class="btn btn-secondary filter-toggle" id="filterToggle">Filtros e ordenação</button></section>
-      <section class="toolbar" aria-label="Pesquisa e filtros rápidos"><div class="search-wrap"><span class="search-icon">⌕</span><input id="searchInput" type="search" placeholder="Buscar Aventureiro..." autocomplete="off" aria-label="Buscar Aventureiro"><button id="clearSearch" class="clear-btn" aria-label="Limpar busca">×</button></div><button class="btn btn-secondary" id="refreshBtn">Atualizar</button></section>
+      <section class="hero"><div><p class="eyebrow">Gestão dos Aventureiros</p><h1>Aventureiros</h1><p class="muted">Gerencie as Jornadas sob sua responsabilidade.</p></div><button class="btn btn-secondary filter-toggle" id="filterToggle">Filtros e ordenação</button></section>
+      <nav class="eq-content-nav" aria-label="Filtros rápidos de Aventureiros"><a href="/healer/aventureiros/">Todos</a><a href="?status=active">Ativos</a><a href="?stage=waiting_healer">Aguardando</a><a href="?stage=checkpoint">Checkpoint</a><a href="?stage=progression">Progressão</a><a href="?activity=alert">Atenção</a></nav><section class="toolbar" aria-label="Pesquisa e filtros rápidos"><div class="search-wrap"><span class="search-icon">⌕</span><input id="searchInput" type="search" placeholder="Buscar Aventureiro..." autocomplete="off" aria-label="Buscar Aventureiro"><button id="clearSearch" class="clear-btn" aria-label="Limpar busca">×</button></div><button class="btn btn-secondary" id="refreshBtn">Atualizar</button></section>
       <section class="summary-grid" aria-label="Resumo da operação"><article class="metric"><span>Total de Aventureiros</span><strong id="mTotal">0</strong></article><article class="metric"><span>Aventureiros ativos</span><strong id="mActive">0</strong></article><article class="metric"><span>Aguardando análise</span><strong id="mWaiting">0</strong></article><article class="metric"><span>Alertas abertos</span><strong id="mAlerts">0</strong></article><article class="metric"><span>Checkpoints próximos</span><strong id="mCheckpoints">0</strong></article><article class="metric"><span>Sem atividade recente</span><strong id="mInactive">0</strong></article></section>
       <section class="filters panel" id="filtersPanel" aria-label="Filtros"><div class="filters-grid">
         <div class="field"><label for="stageFilter">Estado da Jornada</label><select id="stageFilter"><option value="">Todos</option><option value="welcome">Primeiro acesso</option><option value="assessment">Avaliação em andamento</option><option value="waiting_healer">Aguardando Healer</option><option value="dashboard">Jornada ativa</option><option value="checkpoint">Checkpoint</option><option value="feedback">Feedback</option><option value="progression">Progressão</option></select></div>
@@ -37,7 +30,7 @@
     </div>
   </main>
 </div>
-<nav class="bottom-nav" aria-label="Navegação administrativa móvel"><a href="/healer/painel/">⌂<span>Início</span></a><a href="/healer/treinos/">⚔<span>Treinos</span></a><a class="active" href="/healer/aventureiros/">◉<span>Aventureiros</span></a><a href="/healer/exercicios/">▦<span>Biblioteca</span></a><a href="/healer/mais/">•••<span>Mais</span></a></nav>
+
 <div id="toast" class="toast hidden" role="status"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/healer/shared/healer-ui.js"></script><script src="/healer/shared/healer-shell.js"></script><script src="app.js"></script><script src="/healer/shared/healer-components.js"></script>
 </body></html>

@@ -1,0 +1,6 @@
+.vercel/
+.env*
+tmp/
+output/
+*.log
+docs/healer-refactor/

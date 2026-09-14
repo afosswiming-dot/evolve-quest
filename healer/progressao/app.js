@@ -3,7 +3,7 @@
 const SUPABASE_URL='https://gtmngtweohixfeajljik.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF';
 const configured=!SUPABASE_URL.startsWith('YOUR_')&&!SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
-const supabase=configured?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}):null;
+const supabase=configured?window.HealerUI.client(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}):null;
 const PAGE_SIZE=20;
 const state={page:1,search:'',status:'',level:'',order:'priority_desc',total:0};
 const $=selector=>document.querySelector(selector);
@@ -78,7 +78,7 @@ function card(row){
 function checkpointLabel(checkpoint){const labels={none:'nenhum',locked:'pendente',available:'disponível',sent:'enviado',awaiting_analysis:'aguardando análise',completed:'concluído'};return labels[checkpoint?.state]||'nenhum';}
 function initials(name){return name.trim().split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase()||'?';}
 function roman(value){const number=Number(value);if(!Number.isInteger(number)||number<1)return '—';const map=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let rest=number,result='';for(const [amount,symbol] of map){while(rest>=amount){result+=symbol;rest-=amount;}}return result;}
-function date(value){if(!value)return '—';const parsed=new Date(value);return Number.isNaN(parsed.getTime())?'—':new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'short',year:'numeric'}).format(parsed);}
+function date(value){return HealerUI.date(value)}
 
 function paginate(){const pages=Math.max(1,Math.ceil(state.total/PAGE_SIZE)),element=$('#pagination');if(pages<=1){element.innerHTML='';return;}element.innerHTML=`<button ${state.page===1?'disabled':''} data-page="${state.page-1}">‹</button><button aria-current="page">${state.page}</button><button ${state.page===pages?'disabled':''} data-page="${state.page+1}">›</button>`;element.querySelectorAll('[data-page]').forEach(button=>button.onclick=()=>{state.page=Number(button.dataset.page);load();});}
 

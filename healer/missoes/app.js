@@ -10,7 +10,7 @@ const configured =
   !SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
 
 const supabase = configured
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}})
+  ? window.HealerUI.client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}})
   : null;
 
 const state = {
@@ -277,7 +277,7 @@ async function openMission(id) {
 
   if (error || !data) {
     console.error(error);
-    alert('Não foi possível carregar esta Missão.');
+    HealerUI.toast('Não foi possível carregar esta Missão.');
     closeDrawer();
     return;
   }
@@ -321,8 +321,8 @@ async function openMission(id) {
   });
 
   $('#duplicateButton').classList.remove('hidden');
-  $('#archiveButton').classList.remove('hidden');
-  $('#archiveButton').textContent = data.mission.status === 'archived' ? 'Restaurar' : 'Arquivar';
+  $('#archiveButton').classList.toggle('hidden', data.mission.status === 'archived');
+  $('#archiveButton').textContent = 'Arquivar';
 
   updateChapterLevel();
   renderComposition();
@@ -592,7 +592,7 @@ async function saveDraft() {
 
   const errors = validateMission(payload, false);
   if (errors.length) {
-    alert(`Revise os campos obrigatórios: ${errors.join(', ')}.`);
+    HealerUI.toast(`Revise os campos obrigatórios: ${errors.join(', ')}.`);
     return;
   }
 
@@ -603,11 +603,11 @@ async function saveDraft() {
 
   if (error) {
     console.error(error);
-    alert('Não foi possível concluir esta ação agora.');
+    HealerUI.toast('Não foi possível concluir esta ação agora.');
     return;
   }
 
-  alert('Rascunho salvo.');
+  HealerUI.toast('Rascunho salvo.');
   closeDrawer();
   loadMissions();
 }
@@ -617,7 +617,7 @@ async function publishMission() {
 
   const errors = validateMission(payload, true);
   if (errors.length) {
-    alert(`Revise os campos obrigatórios antes de publicar: ${errors.join(', ')}.`);
+    HealerUI.toast(`Revise os campos obrigatórios antes de publicar: ${errors.join(', ')}.`);
     return;
   }
 
@@ -628,7 +628,7 @@ async function publishMission() {
 
   if (saveError) {
     console.error(saveError);
-    alert('Não foi possível salvar o rascunho antes da publicação.');
+    HealerUI.toast('Não foi possível salvar o rascunho antes da publicação.');
     return;
   }
 
@@ -640,20 +640,20 @@ async function publishMission() {
 
   if (publishError) {
     console.error(publishError);
-    alert('Não foi possível publicar esta Missão.');
+    HealerUI.toast('Não foi possível publicar esta Missão.');
     return;
   }
 
-  alert('Missão publicada.');
+  HealerUI.toast('Missão publicada.');
   closeDrawer();
   loadMissions();
 }
 
 async function duplicateMissionDirect(id) {
-  const targetEnvironment = prompt('Digite o ambiente de destino: gym ou home', 'home');
-  if (!['gym', 'home'].includes(targetEnvironment || '')) return;
-
-  const targetChapterId = prompt('Digite o UUID do Capítulo de destino ou deixe em branco para manter o atual', '');
+  const destination = await HealerUI.missionDestination(state.chapters);
+  if (!destination) return;
+  const targetEnvironment = destination.environment;
+  const targetChapterId = destination.chapter;
 
   const { error } = await supabase.rpc('duplicate_mission', {
     p_mission_id: id,
@@ -663,11 +663,11 @@ async function duplicateMissionDirect(id) {
 
   if (error) {
     console.error(error);
-    alert('Não foi possível duplicar esta Missão.');
+    HealerUI.toast('Não foi possível duplicar esta Missão.');
     return;
   }
 
-  alert('Missão duplicada.');
+  HealerUI.toast('Missão duplicada.');
   loadMissions();
 }
 
@@ -683,7 +683,6 @@ async function archiveOrRestoreCurrentMission() {
   const archived = state.currentMission.status === 'archived';
 
   if (archived) {
-    alert('A restauração deverá utilizar a função oficial definida no backend.');
     return;
   }
 
@@ -693,11 +692,11 @@ async function archiveOrRestoreCurrentMission() {
 
   if (error) {
     console.error(error);
-    alert('Não foi possível arquivar esta Missão.');
+    HealerUI.toast('Não foi possível arquivar esta Missão.');
     return;
   }
 
-  alert('Missão arquivada.');
+  HealerUI.toast('Missão arquivada.');
   closeDrawer();
   loadMissions();
 }
@@ -822,7 +821,7 @@ $('#openPreviewButton').addEventListener('click', async () => {
   if (!missionId) {
     const errors = validateMission(payload, false);
     if (errors.length) {
-      alert(`Salve o rascunho antes de abrir a pré-visualização. Campos: ${errors.join(', ')}.`);
+      HealerUI.toast(`Salve o rascunho antes de abrir a pré-visualização. Campos: ${errors.join(', ')}.`);
       return;
     }
 
@@ -833,7 +832,7 @@ $('#openPreviewButton').addEventListener('click', async () => {
 
     if (error) {
       console.error(error);
-      alert('Não foi possível salvar o rascunho para pré-visualização.');
+      HealerUI.toast('Não foi possível salvar o rascunho para pré-visualização.');
       return;
     }
 
@@ -846,21 +845,21 @@ $('#openPreviewButton').addEventListener('click', async () => {
 
     if (error) {
       console.error(error);
-      alert('Não foi possível atualizar o rascunho para pré-visualização.');
+      HealerUI.toast('Não foi possível atualizar o rascunho para pré-visualização.');
       return;
     }
   }
 
   if (!missionId) {
-    alert('Não foi possível identificar a Missão.');
+    HealerUI.toast('Não foi possível identificar a Missão.');
     return;
   }
 
   window.open(`/healer/missoes/detalhe/?mission_id=${encodeURIComponent(missionId)}`, '_blank', 'noopener');
 });
 
-$('#saveDraftButton').addEventListener('click', saveDraft);
-$('#publishButton').addEventListener('click', publishMission);
+$('#saveDraftButton').addEventListener('click', HealerUI.action('#saveDraftButton', saveDraft));
+$('#publishButton').addEventListener('click', HealerUI.action('#publishButton', publishMission));
 $('#duplicateButton').addEventListener('click', duplicateCurrentMission);
 $('#archiveButton').addEventListener('click', archiveOrRestoreCurrentMission);
 

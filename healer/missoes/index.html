@@ -9,33 +9,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
-</head>
+<link rel="stylesheet" href="/healer/shared/healer-tokens.css"><link rel="stylesheet" href="/healer/shared/healer-shell.css"></head>
 <body>
 <a class="skip-link" href="#main">Pular para o conteúdo</a>
 
 <div class="app-shell">
-  <aside class="sidebar" aria-label="Navegação administrativa">
-    <div class="brand">
-      <div class="brand-mark">EQ</div>
-      <div><strong>EVOLVE Quest</strong><span>Área administrativa</span></div>
-    </div>
+  <aside class="sidebar"></aside>
 
-    <nav class="side-nav">
-      <a href="/healer/painel/">Dashboard</a>
-      <a href="/healer/avaliacoes/">Avaliações</a>
-      <a href="/healer/aventureiros/">Aventureiros</a>
-      <a class="active" href="/healer/missoes/">Prescrição</a>
-      <a href="/healer/exercicios/">Exercícios</a>
-      <a href="/healer/registros/">Registros</a>
-      <a href="/healer/alertas/">Alertas</a>
-      <a href="/healer/checkpoints/">Checkpoints</a>
-      <a href="/healer/progressao/">Progressão</a>
-    </nav>
-
-    <div class="side-foot">Modelos oficiais de Missões.</div>
-  </aside>
-
-  <main class="main" id="main">
+  <main class="main" id="main"><nav class="eq-content-nav" aria-label="Conteúdo de Missões"><a href="/healer/missoes/">Biblioteca de Missões</a><a href="/healer/capitulos/">Missões por Capítulo</a><a href="/healer/treinos/">Missões atribuídas</a></nav>
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark">EQ</div>
@@ -54,10 +35,7 @@
         <button class="btn btn-primary" id="newMissionButton">Nova Missão</button>
       </section>
 
-      <nav class="tabs" aria-label="Áreas de Prescrição">
-        <a class="tab" href="/healer/exercicios/">Biblioteca</a>
-        <a class="tab active" href="/healer/missoes/">Missões</a>
-      </nav>
+
 
       <section class="toolbar" aria-label="Pesquisa e ações">
         <div class="search-wrap">
@@ -155,13 +133,7 @@
   </main>
 </div>
 
-<nav class="bottom-nav" aria-label="Navegação administrativa móvel">
-  <a href="/healer/painel/">⌂<span>Início</span></a>
-  <a class="active" href="/healer/missoes/">◈<span>Missões</span></a>
-  <a href="/healer/exercicios/">▦<span>Exercícios</span></a>
-  <a href="/healer/alertas/">!<span>Alertas</span></a>
-  <a href="/healer/mais/">•••<span>Mais</span></a>
-</nav>
+
 
 <div class="drawer" id="missionDrawer" aria-hidden="true">
   <div class="drawer-card" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
@@ -327,6 +299,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./app.js"></script>
+<script src="/healer/shared/healer-ui.js"></script><script src="/healer/shared/healer-shell.js"></script><script src="app.js"></script><script src="/healer/shared/healer-components.js"></script>
 </body>
 </html>

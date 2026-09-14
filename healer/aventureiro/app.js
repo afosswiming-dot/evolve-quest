@@ -2,7 +2,7 @@
 
 const SUPABASE_URL='https://gtmngtweohixfeajljik.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF';
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
+const supabaseClient=window.HealerUI.client(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}
 });
 const $=s=>document.querySelector(s);
@@ -11,11 +11,7 @@ let adventurerId=null;
 let journeyManagement=null;
 let chapterChangePending=false;
 
-function fmtDate(v){
-  if(!v)return'Não informado';
-  const d=new Date(v);
-  return Number.isNaN(d.getTime())?'Não informado':new Intl.DateTimeFormat('pt-BR',{dateStyle:'medium'}).format(d);
-}
+function fmtDate(v){return HealerUI.date(v)}
 function fmtPhone(v){
   const n=String(v||'').replace(/\D/g,'');
   if(n.length===11)return`(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7)}`;
@@ -67,6 +63,7 @@ async function resolveAdventurerId(){
     if(!assessment.error && resolved){
       return {id:resolved,data:null};
     }
+    if(probe.error&&assessment.error)throw probe.error;
   }
 
   const evaluationId=params.get('evaluation_id');
@@ -89,8 +86,6 @@ async function load(preloaded=null){
     setStatus('error','Aventureiro não encontrado. Volte para a lista e abra o perfil novamente.');
     return;
   }
-  if(!(await authorize())) return;
-
   let data=preloaded;
 
   if(!data){
@@ -142,7 +137,7 @@ function render(d){
         <p class="muted">${esc(p.full_name||'')} · ${esc(p.email||'')}</p>
       </div>
     </div>
-    <div class="meta-row">
+    <div class="meta-row"><span class="badge">Nível ${esc(j.current_level||p.current_level||"—")}</span><span class="badge">${esc(ch.title||"Capítulo não definido")}</span>
       <span class="badge">${esc(p.journey_stage||'Estado não informado')}</span>
       <span class="badge">${esc(p.account_status||'Status não informado')}</span>
       <span class="badge">${esc([p.city,p.state].filter(Boolean).join(' · ')||'Local não informado')}</span>
@@ -156,7 +151,7 @@ function render(d){
         <div class="kpi"><small>Nível</small><strong>${j.current_level?`Nível ${esc(j.current_level)}`:(p.current_level?`Nível ${esc(p.current_level)}`:'Não definido')}</strong></div>
         <div class="kpi"><small>Capítulo</small><strong>${esc(ch.title||'Não liberado')}</strong></div>
         <div class="kpi"><small>Progresso</small><strong>${Number(j.chapter_progress||0)}%</strong></div>
-        <div class="kpi"><small>Sequência</small><strong>${Number(j.current_streak||0)} dias</strong></div>
+        <div class="kpi"><small>XP</small><strong>${j.total_xp??"Não informado"}</strong></div><div class="kpi"><small>Última atividade</small><strong>${fmtDate(d.recentRegistrations?.[0]?.submitted_at)}</strong></div><div class="kpi"><small>Sequência</small><strong>${Number(j.current_streak||0)} dias</strong></div>
         <div class="kpi"><small>Início da Jornada</small><strong>${fmtDate(j.started_at)}</strong></div>
       </div>
     </section>
@@ -175,14 +170,14 @@ function render(d){
     <section class="section panel">
       <div class="section-head"><h2>Próxima ação</h2></div>
       <p>${esc(d.recommendedAction?.label||'Nenhuma ação prioritária no momento.')}</p>
-      ${d.recommendedAction?.url?`<a class="btn btn-primary" href="${esc(d.recommendedAction.url)}">Abrir módulo</a>`:''}
+      ${d.recommendedAction?.url?`<a class="btn btn-primary" href="${esc(HealerUI.route(d.recommendedAction.url))}">Abrir módulo</a>`:''}
     </section>
 
     <section class="section panel wide" data-section="missions">
-      <div class="section-head"><h2>Missões prescritas</h2></div>
+      <div class="section-head"><h2>Missões do Capítulo atual</h2></div><p class="muted">${esc(ch.objective||"Acompanhe as Missões e os Registros deste Capítulo.")}</p>
       <div class="stack">${
         (d.missions||[]).length
-          ? d.missions.map(m=>`<div class="row-item"><div><strong>${esc(m.name||m.mission_type||'Missão')}</strong><p class="muted">${esc(m.environment||'')} · ${esc(m.status||'')}</p></div></div>`).join('')
+          ? d.missions.map(m=>`<div class="row-item"><div><strong>${esc(m.name||m.mission_type||'Missão')}</strong><p class="muted">${esc(m.environment||'')} · ${esc(HealerUI.status(m.status))}</p></div></div>`).join('')
           : '<div class="empty"><strong>Nenhuma Missão prescrita no Capítulo atual.</strong></div>'
       }</div>
     </section>
@@ -205,11 +200,11 @@ function render(d){
       }</div>
     </section>
 
-    <section class="section panel">
+    <section class="section panel" data-section="checkpoint">
       <div class="section-head"><h2>Checkpoint</h2></div>
       ${
         d.checkpoint
-          ? `<div class="kpi-grid"><div class="kpi"><small>Status</small><strong>${esc(d.checkpoint.status)}</strong></div><div class="kpi"><small>Vencimento</small><strong>${fmtDate(d.checkpoint.due_at)}</strong></div></div>`
+          ? `<div class="kpi-grid"><div class="kpi"><small>Status</small><strong>${esc(HealerUI.status(d.checkpoint.status))}</strong></div><div class="kpi"><small>Vencimento</small><strong>${fmtDate(d.checkpoint.due_at)}</strong></div></div>`
           : '<div class="empty"><strong>Nenhum Checkpoint disponível.</strong></div>'
       }
     </section>
@@ -223,6 +218,7 @@ function render(d){
       }</div>
     </section>`;
 
+  const quick=document.createElement('nav');quick.className='eq-content-nav';quick.setAttribute('aria-label','Ações da Jornada');quick.innerHTML=`<a href="#" data-jump="journey-management">Ver Jornada</a><a href="/healer/treinos/?adventurer_id=${encodeURIComponent(adventurerId)}">Gerenciar Missões</a><a href="#" data-jump="registrations">Ver Registros</a><a href="#" data-jump="checkpoint">Ver Checkpoint</a>`;hero.append(quick);quick.querySelectorAll('[data-jump]').forEach(a=>a.onclick=e=>{e.preventDefault();document.querySelector('[data-section="'+a.dataset.jump+'"]').scrollIntoView({behavior:'smooth'})});
   bindJourneyManagement();
 }
 
@@ -250,13 +246,16 @@ function renderJourneyManagement(){
   }
 
   return `<section class="section panel wide journey-management" data-section="journey-management">
-    <div class="section-head"><div><h2>Gerenciar Jornada</h2><p class="muted section-description">Transicione o Capítulo sem criar uma nova Jornada ou alterar o histórico do Aventureiro.</p></div></div>
+    <div class="section-head"><div><h2>Jornada atual</h2><p class="muted section-description">Acompanhe os Capítulos e o próximo passo deste Aventureiro.</p></div></div>
     <div class="kpi-grid journey-kpis">
       <div class="kpi"><small>Capítulo atual</small><strong>${esc(chapterLabel(current))}</strong></div>
       <div class="kpi"><small>Nível atual</small><strong>${journey.currentLevel?`Nível ${esc(journey.currentLevel)}`:'Não definido'}</strong></div>
       <div class="kpi"><small>Status da Jornada</small><strong>${esc(journeyStatusLabel(journey.status))}</strong></div>
       <div class="kpi"><small>Início do capítulo atual</small><strong>${fmtDate(journey.chapterStartedAt)}</strong></div>
     </div>
+    <div class="eq-chapter-map">${chapters.map(ch=>`<div ${ch.id===current?.id?'aria-current="step"':''}><small>Nível ${esc(ch.level_number||journey.currentLevel||'—')}</small><strong>${esc(chapterLabel(ch))}</strong>${ch.id===current?.id?'<p>Capítulo atual</p>':''}</div>`).join('')}</div>
+    <button type="button" class="btn btn-secondary" id="openChapterChange">Ações · Alterar capítulo</button>
+    <dialog id="chapterChangeDialog" class="eq-dialog"><header><h2>Alterar capítulo</h2><button type="button" class="btn" id="closeChapterChange" aria-label="Fechar">×</button></header><p>Capítulo atual: ${esc(chapterLabel(current))}</p>
     <form id="chapterChangeForm" class="journey-form">
       <div class="field">
         <label for="newChapterId">Novo capítulo</label>
@@ -266,18 +265,20 @@ function renderJourneyManagement(){
         </select>
       </div>
       <div class="field">
-        <label for="chapterObservation">Observação <span class="optional">(opcional)</span></label>
+        <label for="chapterObservation">Motivo <span class="optional">(opcional)</span></label>
         <textarea id="chapterObservation" name="chapterObservation" rows="3" maxlength="1000" placeholder="Contexto administrativo para esta transição"></textarea>
       </div>
       <div class="journey-form-footer">
         <p class="muted form-hint">A transição preserva XP, conquistas, registros, execuções, checkpoints e a Jornada existente.</p>
         <button class="btn btn-primary" id="changeChapterButton" type="submit" disabled>Alterar capítulo</button>
       </div>
-    </form>
+    </form></dialog>
   </section>`;
 }
 
 function bindJourneyManagement(){
+  $('#openChapterChange')?.addEventListener('click',()=>HealerUI.dialog('chapterChangeDialog'));
+  $('#closeChapterChange')?.addEventListener('click',()=>$('#chapterChangeDialog').close());
   const form=$('#chapterChangeForm');
   const select=$('#newChapterId');
   const button=$('#changeChapterButton');
@@ -296,7 +297,7 @@ function bindJourneyManagement(){
     if(!current||!target)return;
 
     const confirmation=`Você está alterando o Capítulo deste Aventureiro de ${chapterLabel(current)} para ${chapterLabel(target)}.`;
-    if(!window.confirm(`${confirmation}\n\nDeseja confirmar esta transição?`))return;
+    if(!await HealerUI.confirm(`${confirmation}\n\nDeseja confirmar esta transição?`))return;
 
     chapterChangePending=true;
     button.disabled=true;
@@ -320,7 +321,9 @@ function bindJourneyManagement(){
     }
 
     chapterChangePending=false;
+    $('#chapterChangeDialog')?.close();
     await load();
+    HealerUI.toast('Capítulo alterado com sucesso.','success');
     setStatus('success',`Capítulo alterado com sucesso para ${chapterLabel(target)}.`);
   });
 }
@@ -336,6 +339,8 @@ function bindTabs(){
 }
 
 async function init(){
+  try{
+  setStatus('loading','Carregando Aventureiro...');
   bindTabs();
   if(!(await authorize())) return;
 
@@ -354,5 +359,6 @@ async function init(){
   }
 
   await load(resolved.data);
+  }catch(error){console.error('[Healer Hub]',error);setStatus('error','Não foi possível carregar este Aventureiro. Tente novamente.');}
 }
 document.addEventListener('DOMContentLoaded',init);

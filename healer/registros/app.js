@@ -11,7 +11,7 @@ const configured =
   !SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
 
 const supabaseClient = configured
-  ? window.supabase.createClient(
+  ? window.HealerUI.client(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY,
       {
@@ -645,9 +645,7 @@ function card(r) {
 
           <strong>
             ${esc(
-              r.submittedAt ||
-              r.createdAt ||
-              '—'
+              HealerUI.date(r.submittedAt || r.createdAt, true)
             )}
           </strong>
 
@@ -673,6 +671,7 @@ function card(r) {
       </div>
 
 
+      <div class="data-grid"><div class="datum"><small>Dor</small><strong>${esc(r.painLabel||({no_pain:'Sem dor',yes:'Dor relatada',no:'Sem dor',improved:'Melhorou',same:'Sem mudança',worsened:'Piorou'})[r.painStatus]||'Não informado')}</strong></div><div class="datum"><small>Feedback</small><strong>${esc(r.feedback||r.adventurerFeedback||'Não informado')}</strong></div></div>
       <div class="actions">
 
         <button
@@ -743,12 +742,13 @@ async function openDetail(id) {
       <div class="error panel">
 
         <strong>
-          Este recurso não está disponível.
+          Não foi possível carregar o Registro agora.
         </strong>
-
+        <button id="retryDetail" class="btn btn-secondary">Tentar novamente</button>
       </div>
     `;
 
+    $('#retryDetail').onclick=()=>openDetail(id);
     return;
   }
 
@@ -833,16 +833,10 @@ function renderDetail(d) {
 
       <div class="field">
 
-        <label
-          for="registrationNote"
-        >
-          Nota do Healer
-        </label>
 
 
-        <textarea
-          id="registrationNote"
-        ></textarea>
+
+        <p class="muted">Consulte o feedback do Aventureiro no resumo acima.</p>
 
       </div>
 

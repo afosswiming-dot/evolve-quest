@@ -10,7 +10,7 @@ const configured =
   !SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
 
 const supabase = configured
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}})
+  ? window.HealerUI.client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}})
   : null;
 
 const state = {
@@ -274,7 +274,7 @@ async function openExercise(id) {
 
   if (error || !data) {
     $('#drawerTitle').textContent = 'Exercício indisponível';
-    alert('Não foi possível carregar este exercício.');
+    HealerUI.toast('Não foi possível carregar este exercício.');
     return;
   }
 
@@ -345,13 +345,13 @@ async function saveExercise(event) {
   const payload = collectFormData();
 
   if (!payload.name) {
-    alert('Informe o nome do exercício.');
+    HealerUI.toast('Informe o nome do exercício.');
     $('#nameInput').focus();
     return;
   }
 
   if (!payload.environment.length) {
-    alert('Selecione ao menos um ambiente.');
+    HealerUI.toast('Selecione ao menos um ambiente.');
     $('#environmentInput').focus();
     return;
   }
@@ -362,11 +362,11 @@ async function saveExercise(event) {
 
   if (error) {
     console.error(error);
-    alert('Não foi possível concluir esta ação agora.');
+    HealerUI.toast('Não foi possível concluir esta ação agora.');
     return;
   }
 
-  alert('Exercício salvo.');
+  HealerUI.toast('Exercício salvo.');
   closeDrawer();
   loadExercises();
 }
@@ -385,11 +385,11 @@ async function duplicateExercise() {
 
   if (error) {
     console.error(error);
-    alert('Não foi possível duplicar este exercício.');
+    HealerUI.toast('Não foi possível duplicar este exercício.');
     return;
   }
 
-  alert('Exercício duplicado.');
+  HealerUI.toast('Exercício duplicado.');
   closeDrawer();
   loadExercises();
 }
@@ -406,11 +406,11 @@ async function archiveOrRestoreExercise() {
 
   if (error) {
     console.error(error);
-    alert('Não foi possível concluir esta ação agora.');
+    HealerUI.toast('Não foi possível concluir esta ação agora.');
     return;
   }
 
-  alert(isArchived ? 'Exercício restaurado.' : 'Exercício arquivado.');
+  HealerUI.toast(isArchived ? 'Exercício restaurado.' : 'Exercício arquivado.');
   closeDrawer();
   loadExercises();
 }
@@ -494,7 +494,7 @@ $('#exerciseDrawer').addEventListener('click', (event) => {
   if (event.target === $('#exerciseDrawer')) closeDrawer();
 });
 
-$('#exerciseForm').addEventListener('submit', saveExercise);
+$('#exerciseForm').addEventListener('submit', HealerUI.action('#exerciseForm button[type="submit"]', saveExercise));
 $('#duplicateButton').addEventListener('click', duplicateExercise);
 $('#archiveButton').addEventListener('click', archiveOrRestoreExercise);
 $('#mediaUrlInput').addEventListener('input', updateMediaPreview);

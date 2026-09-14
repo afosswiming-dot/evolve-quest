@@ -1,6 +1,6 @@
 'use strict';
 
-const db = window.supabase.createClient(
+const db = window.HealerUI.client(
   'https://gtmngtweohixfeajljik.supabase.co',
   'sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF',
   {
@@ -98,6 +98,7 @@ async function load() {
 ========================================================= */
 
 function render() {
+  const focusedId = new URLSearchParams(location.search).get('adventurer_id');
   const q = $('#searchInput').value.toLowerCase();
   const f = $('#statusFilter').value;
 
@@ -105,6 +106,7 @@ function render() {
     const n = (a.preferredName || a.fullName || '').toLowerCase();
 
     return (
+      (!focusedId || String(a.id) === focusedId) &&
       (!q || n.includes(q)) &&
       (!f ||
         (f === 'with'
@@ -142,7 +144,7 @@ function render() {
           class="btn primary"
           data-new="${a.id}"
         >
-          + Novo treino
+          + Nova Missão
         </button>
 
       </div>
@@ -163,7 +165,7 @@ function render() {
         </span>
 
         <span class="tag">
-          ${(a.missions || []).length} treinos
+          ${(a.missions || []).length} Missões
         </span>
 
       </div>
@@ -176,7 +178,7 @@ function render() {
             ? (a.missions || [])
                 .map(
                   m => `
-                  
+
           <div class="mission">
 
             <div>
@@ -226,11 +228,11 @@ function render() {
             </div>
 
           </div>
-          
+
         `
                 )
                 .join('')
-            : '<div class="empty">Nenhum treino atribuído.</div>'
+            : '<div class="empty">Nenhuma Missão atribuída.</div>'
         }
 
       </div>
@@ -269,9 +271,9 @@ function render() {
       const missionName =
         b.dataset.name || 'Missão';
 
-      const confirmed = window.confirm(
+      const confirmed = await HealerUI.confirm(
         `Excluir "${missionName}"?\n\n` +
-        `Essa ação removerá este treino da prescrição do Aventureiro.\n\n` +
+        `Essa ação removerá esta Missão da prescrição do Aventureiro.\n\n` +
         `Deseja continuar?`
       );
 
@@ -295,7 +297,7 @@ function render() {
           throw error;
         }
 
-        alert(
+        HealerUI.toast(
           data?.message ||
           'Treino excluído com sucesso.'
         );
@@ -309,7 +311,7 @@ function render() {
           error
         );
 
-        alert(
+        HealerUI.toast(
           error?.message ||
           'Não foi possível excluir o treino.'
         );
@@ -360,7 +362,7 @@ function openNew(id) {
   reset();
 
   $('#editorTitle').textContent =
-    'Novo treino personalizado';
+    'Nova Missão personalizada';
 
   $('#editorAdventurer').textContent =
     current.preferredName || current.fullName;
@@ -381,7 +383,7 @@ async function openEdit(aid, mid) {
   currentMissionId = mid;
 
   $('#editorTitle').textContent =
-    'Editar treino';
+    'Editar Missão';
 
   $('#editorAdventurer').textContent =
     current.preferredName || current.fullName;
@@ -397,7 +399,7 @@ async function openEdit(aid, mid) {
 
   if (error || !data) {
     console.error(error);
-    alert('Não foi possível carregar o treino.');
+    HealerUI.toast('Não foi possível carregar o treino.');
     return;
   }
 
@@ -478,7 +480,7 @@ async function loadTemplate() {
 
   if (error) {
     console.error(error);
-    alert(
+    HealerUI.toast(
       'Não foi possível localizar o modelo oficial.'
     );
     return;
@@ -491,7 +493,7 @@ async function loadTemplate() {
     (templates || [])[0];
 
   if (!template) {
-    alert(
+    HealerUI.toast(
       'Ainda não existe um modelo oficial para esta combinação.'
     );
     return;
@@ -509,7 +511,7 @@ async function loadTemplate() {
 
   if (detailError || !data) {
     console.error(detailError);
-    alert(
+    HealerUI.toast(
       'Não foi possível carregar o modelo.'
     );
     return;
@@ -535,7 +537,7 @@ function renderComp() {
       ? composition
           .map(
             (x, i) => `
-      
+
       <div class="exercise">
 
         <div class="exercise-top">
@@ -633,7 +635,7 @@ function renderComp() {
         </div>
 
       </div>
-      
+
     `
           )
           .join('')
@@ -800,7 +802,7 @@ async function loadLib() {
       ? library
           .map(
             x => `
-      
+
       <div class="lib-item">
 
         <img
@@ -837,7 +839,7 @@ async function loadLib() {
         </button>
 
       </div>
-      
+
     `
           )
           .join('')
@@ -901,7 +903,7 @@ async function save() {
     !composition.length
   ) {
 
-    alert(
+    HealerUI.toast(
       'Informe o nome e adicione ao menos um exercício.'
     );
 
@@ -995,8 +997,8 @@ async function save() {
 
     console.error(error);
 
-    alert(
-      error.message ||
+    HealerUI.toast(
+
       'Não foi possível salvar.'
     );
 
@@ -1004,10 +1006,10 @@ async function save() {
   }
 
 
-  alert(
+  HealerUI.toast(
     data?.cloned
-      ? 'Treino individual criado e atribuído sem alterar o modelo oficial.'
-      : 'Treino deste Aventureiro atualizado com sucesso.'
+      ? 'Missão individual criada e atribuído sem alterar o modelo oficial.'
+      : 'Missão deste Aventureiro atualizada com sucesso.'
   );
 
 

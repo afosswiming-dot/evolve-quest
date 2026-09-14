@@ -4,35 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#12091f" />
-  <meta name="description" content="Dashboard administrativo da EVOLVE Quest para Healers autorizados." />
-  <title>Dashboard do Healer | EVOLVE Quest</title>
+  <meta name="description" content="Painel administrativo da EVOLVE Quest para Healers autorizados." />
+  <title>Painel do Healer | EVOLVE Quest</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-</head>
+<link rel="stylesheet" href="/healer/shared/healer-tokens.css"><link rel="stylesheet" href="/healer/shared/healer-shell.css"></head>
 <body>
   <div class="app-shell" id="appShell" aria-busy="true">
-    <aside class="sidebar" aria-label="Navegação administrativa">
-      <a class="brand" href="/healer/painel/" aria-label="EVOLVE Quest — Dashboard">
-        <span class="brand-mark" aria-hidden="true">⌃⌃</span>
-        <span><strong>EVOLVE</strong><small>QUEST · HEALER</small></span>
-      </a>
-
-      <nav class="side-nav">
-        <a class="nav-link is-active" href="/healer/painel/" aria-current="page"><span>⌂</span>Dashboard</a>
-        <a class="nav-link" href="/healer/avaliacoes/"><span>◇</span>Avaliações</a>
-        <a class="nav-link" href="/healer/aventureiros/"><span>◉</span>Aventureiros</a>
-        <a class="nav-link" href="/healer/treinos/"><span>⚔</span>Treinos</a>
-        <a class="nav-link" href="/healer/exercicios/"><span>▦</span>Biblioteca</a>
-        <a class="nav-link" href="/healer/registros/"><span>≡</span>Registros</a>
-        <a class="nav-link" href="/healer/alertas/"><span>!</span>Alertas</a>
-        <a class="nav-link" href="/healer/checkpoints/"><span>✓</span>Checkpoints</a>
-        <a class="nav-link" href="/healer/progressao/"><span>↗</span>Progressão</a>
-        <a class="nav-link" href="/admin/configuracoes/?tab=chapters"><span>⚙</span>Capítulos</a>
-      </nav>
-
-      <div class="sidebar-footer">
+    <aside class="sidebar"><div class="sidebar-footer">
         <div class="admin-chip">
           <span class="avatar" id="sidebarAvatar">H</span>
           <span><strong id="sidebarName">Healer</strong><small id="sidebarRole">Área administrativa</small></span>
@@ -49,7 +30,7 @@
           <p>Veja o que precisa da sua atenção hoje.</p>
         </div>
         <div class="topbar-actions">
-          <button class="icon-button" id="refreshButton" type="button" aria-label="Atualizar Dashboard" title="Atualizar Dashboard">↻</button>
+          <button class="icon-button" id="refreshButton" type="button" aria-label="Atualizar Painel" title="Atualizar Painel">↻</button>
           <div class="profile-summary">
             <span class="avatar" id="headerAvatar">H</span>
             <span><strong id="headerName">Healer</strong><small id="headerEmail">—</small></span>
@@ -78,18 +59,12 @@
               <span class="metric-icon">◉</span><span class="metric-value" id="activeAdventurers">0</span>
               <strong>Aventureiros ativos</strong><small>Em jornada ativa</small>
             </a>
-            <a class="metric-card alert" href="/healer/alertas/?status=new">
-              <span class="metric-icon">!</span><span class="metric-value" id="newAlerts">0</span>
-              <strong>Alertas novos</strong><small>Precisam de atenção</small>
-            </a>
+            <a class="metric-card" href="/healer/progressao/?status=fit_progression"><span class="metric-icon">↗</span><span class="metric-value" id="readyProgressions">—</span><strong>Aptos para progressão</strong><small>Prontos para a próxima etapa</small></a><span id="newAlerts" hidden></span>
             <a class="metric-card" href="/healer/checkpoints/?status=pending">
               <span class="metric-icon">✓</span><span class="metric-value" id="pendingCheckpoints">0</span>
               <strong>Checkpoints pendentes</strong><small>Disponíveis ou em andamento</small>
             </a>
-            <a class="metric-card" href="/healer/registros/?period=recent">
-              <span class="metric-icon">≡</span><span class="metric-value" id="recentRegistrations">0</span>
-              <strong>Registros recentes</strong><small>Enviados nos últimos 7 dias</small>
-            </a>
+            <span id="recentRegistrations" hidden></span>
           </div>
         </section>
 
@@ -110,41 +85,22 @@
           <div class="shortcuts-grid">
             <a href="/healer/avaliacoes/"><span>◇</span><strong>Avaliações</strong><small>Analisar envios pendentes</small></a>
             <a href="/healer/aventureiros/"><span>◉</span><strong>Aventureiros</strong><small>Acompanhar jornadas ativas</small></a>
-            <a href="/healer/treinos/"><span>⚔</span><strong>Treinos</strong><small>Montar e personalizar Missões</small></a>
-            <a href="/healer/exercicios/"><span>▦</span><strong>Biblioteca</strong><small>Gerenciar exercícios disponíveis</small></a>
+            <a href="/healer/treinos/"><span>⚔</span><strong>Missões atribuídas</strong><small>Montar e personalizar Missões</small></a>
+            <a href="/healer/exercicios/"><span>▦</span><strong>Exercícios</strong><small>Gerenciar exercícios disponíveis</small></a>
             <a href="/healer/registros/"><span>≡</span><strong>Registros</strong><small>Consultar feedbacks recentes</small></a>
             <a href="/healer/alertas/"><span>!</span><strong>Alertas</strong><small>Priorizar ocorrências</small></a>
             <a href="/healer/checkpoints/"><span>✓</span><strong>Checkpoints</strong><small>Acompanhar ciclos de evolução</small></a>
             <a href="/healer/progressao/"><span>↗</span><strong>Progressão</strong><small>Preparar próximas decisões</small></a>
-            <a href="/admin/configuracoes/?tab=chapters"><span>⚙</span><strong>Capítulos</strong><small>Gerenciar o catálogo da Jornada</small></a>
+            <a href="/healer/capitulos/"><span>⚙</span><strong>Capítulos</strong><small>Gerenciar o catálogo da Jornada</small></a>
           </div>
         </section>
       </div>
     </main>
 
-    <nav class="bottom-nav" aria-label="Navegação administrativa móvel">
-      <a class="is-active" href="/healer/painel/"><span>⌂</span>Início</a>
-      <a href="/healer/avaliacoes/"><span>◇</span>Avaliações</a>
-      <a href="/healer/aventureiros/"><span>◉</span>Aventureiros</a>
-      <a href="/healer/alertas/"><span>!</span>Alertas</a>
-      <button id="mobileMoreButton" type="button"><span>•••</span>Mais</button>
-    </nav>
-  </div>
 
-  <div class="mobile-menu" id="mobileMenu" hidden>
-    <div class="mobile-menu-card" role="dialog" aria-modal="true" aria-labelledby="mobileMenuTitle">
-      <div class="panel-heading"><h2 id="mobileMenuTitle">Mais opções</h2><button class="icon-button" id="closeMobileMenu" type="button" aria-label="Fechar menu">×</button></div>
-      <a href="/healer/treinos/">Treinos <span>›</span></a>
-      <a href="/healer/exercicios/">Biblioteca <span>›</span></a>
-      <a href="/healer/registros/">Registros <span>›</span></a>
-      <a href="/healer/checkpoints/">Checkpoints <span>›</span></a>
-      <a href="/healer/progressao/">Progressão <span>›</span></a>
-      <a href="/admin/configuracoes/?tab=chapters">Capítulos <span>›</span></a>
-      <button class="danger-link" id="mobileLogoutButton" type="button">Sair do Painel</button>
-    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js" defer></script>
+  <script src="/healer/shared/healer-ui.js"></script><script src="/healer/shared/healer-shell.js"></script><script src="app.js"></script><script src="/healer/shared/healer-components.js"></script>
 </body>
 </html>

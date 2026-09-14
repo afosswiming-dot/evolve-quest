@@ -14,7 +14,6 @@ button{cursor:pointer}
 :focus-visible{outline:3px solid rgba(75,32,130,.28);outline-offset:3px}
 .skip-link{position:absolute;left:-9999px}.skip-link:focus{left:16px;top:16px;z-index:100;background:#fff;padding:10px 14px}
 .app-shell{min-height:100vh}
-.sidebar{display:none}
 .main{min-width:0}
 .topbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:15px 18px;background:rgba(251,250,252,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px}
@@ -77,9 +76,6 @@ p{line-height:1.55}
 .pagination{display:flex;justify-content:center;gap:8px;margin-top:22px}
 .pagination button{width:42px;height:42px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .pagination button[aria-current="page"]{background:var(--purple-800);color:#fff}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.68rem;color:var(--muted);padding:7px}
-.bottom-nav a.active{color:var(--purple-800);font-weight:800}
 .drawer,.modal{position:fixed;inset:0;z-index:50;display:none;background:rgba(20,10,34,.48)}
 .drawer.open,.modal.open{display:block}
 .drawer-card{position:absolute;right:0;top:0;width:min(860px,100%);height:100%;overflow:auto;background:var(--paper);padding:20px;box-shadow:-18px 0 50px rgba(0,0,0,.16)}
@@ -117,14 +113,8 @@ p{line-height:1.55}
 }
 @media(min-width:1080px){
   .app-shell{display:grid;grid-template-columns:250px 1fr}
-  .sidebar{display:flex;position:sticky;top:0;height:100vh;flex-direction:column;background:var(--purple-950);color:#fff;padding:24px 18px}
-  .side-nav{display:grid;gap:6px;margin-top:34px}
-  .side-nav a{padding:12px 13px;border-radius:12px;color:#d8cde4}
-  .side-nav a.active,.side-nav a:hover{background:rgba(255,255,255,.1);color:#fff}
-  .side-foot{margin-top:auto;color:#bcaacb;font-size:.8rem}
   .topbar{display:none}
   .content{padding-top:44px;padding-bottom:48px}
-  .bottom-nav{display:none}
   .filters{display:block}
   .filter-toggle{display:none}
   .mission-grid{grid-template-columns:repeat(3,minmax(0,1fr))}

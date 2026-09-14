@@ -7,3 +7,11 @@ scripts/
 *.zip
 Imagem do Codex*.png
 Slide *
+
+tools/
+docs/
+.git/
+.vercel/
+.env*
+*.log
+**/LEIA-ME*.txt

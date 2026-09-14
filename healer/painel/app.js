@@ -9,7 +9,7 @@ const els = {
   shell: document.querySelector('#appShell'), status: document.querySelector('#statusPanel'), content: document.querySelector('#dashboardContent'),
   greeting: document.querySelector('#greeting'), headerName: document.querySelector('#headerName'), headerEmail: document.querySelector('#headerEmail'), headerAvatar: document.querySelector('#headerAvatar'), sidebarName: document.querySelector('#sidebarName'), sidebarRole: document.querySelector('#sidebarRole'), sidebarAvatar: document.querySelector('#sidebarAvatar'),
   pendingAssessments: document.querySelector('#pendingAssessments'), activeAdventurers: document.querySelector('#activeAdventurers'), newAlerts: document.querySelector('#newAlerts'), pendingCheckpoints: document.querySelector('#pendingCheckpoints'), recentRegistrations: document.querySelector('#recentRegistrations'),
-  priorityList: document.querySelector('#priorityList'), activityList: document.querySelector('#activityList'), refreshButton: document.querySelector('#refreshButton'), logoutButton: document.querySelector('#logoutButton'), mobileLogoutButton: document.querySelector('#mobileLogoutButton'), mobileMoreButton: document.querySelector('#mobileMoreButton'), mobileMenu: document.querySelector('#mobileMenu'), closeMobileMenu: document.querySelector('#closeMobileMenu')
+  priorityList: document.querySelector('#priorityList'), activityList: document.querySelector('#activityList'), refreshButton: document.querySelector('#refreshButton'), logoutButton: document.querySelector('#logoutButton')
 };
 
 let supabaseClient = null;
@@ -46,7 +46,7 @@ async function getSummaryFallback(){
     supabaseClient.from('initial_evaluations').select('id',{count:'exact',head:true}).in('status',['submitted','under_analysis','returned_for_editing']),
     supabaseClient.from('profiles').select('id',{count:'exact',head:true}).eq('role','adventurer').eq('account_status','active').in('journey_stage',['dashboard','checkpoint','feedback','progression']),
     supabaseClient.from('healer_alerts').select('id',{count:'exact',head:true}).eq('status','new'),
-    supabaseClient.from('checkpoint_assignments').select('id',{count:'exact',head:true}).in('status',['available','in_progress']),
+    supabaseClient.from('checkpoint_assignments').select('id',{count:'exact',head:true}).in('status',['available','in_progress','submitted']),
     supabaseClient.from('mission_registrations').select('id',{count:'exact',head:true}).gte('submitted_at',since)
   ]);
   const errors=[assessments,adventurers,alerts,checkpoints,registrations].map(r=>r.error).filter(Boolean); if(errors.length) throw errors[0];
@@ -62,20 +62,20 @@ async function getSummary(){
 async function getPriorityItems(){
   const rpc=await supabaseClient.rpc('get_healer_priority_items');
   if(!rpc.error&&Array.isArray(rpc.data)) return rpc.data.slice(0,5);
-  return [];
+  throw rpc.error||new Error('Não foi possível carregar os dados');
 }
 async function getRecentActivity(){
   const rpc=await supabaseClient.rpc('get_healer_recent_activity');
   if(!rpc.error&&Array.isArray(rpc.data)) return rpc.data.slice(0,10);
-  return [];
+  throw rpc.error||new Error('Não foi possível carregar a atividade');
 }
 
 function renderUser(user){ const name=user.displayName; const avatar=initials(name); els.greeting.textContent=`${greetingForHour()}, ${name.split(' ')[0]}.`; [els.headerName,els.sidebarName].forEach(e=>e.textContent=name); els.headerEmail.textContent=user.profile.email||user.session.user.email||''; els.sidebarRole.textContent=user.profile.role==='admin'?'Administrador':'Healer'; [els.headerAvatar,els.sidebarAvatar].forEach(e=>e.textContent=avatar); }
 function renderSummary(s){ els.pendingAssessments.textContent=s.pendingAssessments??s.pending_assessments??0; els.activeAdventurers.textContent=s.activeAdventurers??s.active_adventurers??0; els.newAlerts.textContent=s.newAlerts??s.new_alerts??0; els.pendingCheckpoints.textContent=s.pendingCheckpoints??s.pending_checkpoints??0; els.recentRegistrations.textContent=s.recentRegistrations??s.recent_registrations??0; }
-function itemRoute(item){ return item.route||({alert:'/healer/alertas/',assessment:'/healer/avaliacoes/',checkpoint:'/healer/checkpoints/',registration:'/healer/registros/',adventurer:'/healer/aventureiros/'}[item.type]||'/healer/painel/'); }
+function itemRoute(item){ return HealerUI.route(item.route,({alert:'/healer/alertas/',assessment:'/healer/avaliacoes/',checkpoint:'/healer/checkpoints/',registration:'/healer/registros/',adventurer:'/healer/aventureiros/'}[item.type]||'/healer/painel/')); }
 function renderPriorities(items){
   if(!items.length){ els.priorityList.innerHTML='<div class="empty-state"><strong>Tudo em ordem por aqui.</strong>Nenhuma prioridade nova foi encontrada.</div>'; return; }
-  els.priorityList.innerHTML=items.map(i=>`<div class="list-item"><span class="item-symbol ${i.severity==='high'||i.severity==='critical'?'high':''}">${i.severity==='high'||i.severity==='critical'?'!':'◇'}</span><div class="item-copy"><strong>${escapeHtml(i.title||i.type||'Item pendente')}</strong><span>${escapeHtml(i.adventurer_name||i.name||'Aventureiro')}</span><small>${escapeHtml(i.summary||'')} ${escapeHtml(relativeTime(i.created_at||i.date))}</small></div><a class="item-action" href="${escapeHtml(itemRoute(i))}">${escapeHtml(i.action_label||'Abrir')}</a></div>`).join('');
+  els.priorityList.innerHTML=[...items].sort((a,b)=>({critical:0,high:1,medium:2,low:3}[a.severity]??4)-({critical:0,high:1,medium:2,low:3}[b.severity]??4)).map(i=>`<div class="list-item"><span class="item-symbol ${i.severity==='high'||i.severity==='critical'?'high':''}">${i.severity==='high'||i.severity==='critical'?'!':'◇'}</span><div class="item-copy"><strong>${escapeHtml(i.title||i.type||'Item pendente')}</strong><span>${escapeHtml(i.adventurer_name||i.name||'Aventureiro')}</span><small>${escapeHtml(i.summary||'')} ${escapeHtml(relativeTime(i.created_at||i.date))}</small></div><a class="item-action" href="${escapeHtml(itemRoute(i))}">${escapeHtml(i.action_label||'Abrir')}</a></div>`).join('');
 }
 function renderActivity(items){
   if(!items.length){ els.activityList.innerHTML='<div class="empty-state"><strong>Nenhuma atividade recente.</strong>Os eventos mais recentes aparecerão aqui.</div>'; return; }
@@ -88,7 +88,8 @@ async function loadDashboard(){
   try{
     const user=await validateAdminSession(); if(!user)return;
     renderUser(user);
-    const [summary,priorities,activity]=await Promise.all([getSummary(),getPriorityItems(),getRecentActivity()]);
+    const [summary,priorities,activity,progressions]=await Promise.all([getSummary(),getPriorityItems(),getRecentActivity(),supabaseClient.rpc("get_healer_progressions",{p_search:null,p_status:null,p_level:null,p_page:1,p_page_size:1,p_order:"priority_desc"})]);
+    document.getElementById("readyProgressions").textContent=progressions.error?"Indisponível":String(progressions.data?.summary?.awaitingProgression??"—");
     renderSummary(summary); renderPriorities(priorities); renderActivity(activity); showContent();
   }catch(error){
     console.error('[EVOLVE Dashboard]',error);
@@ -96,12 +97,11 @@ async function loadDashboard(){
     else setStatus('error','Não foi possível carregar o Painel agora.','Verifique sua conexão e tente novamente.',true);
   }
 }
-async function logout(){ if(supabaseClient) await supabaseClient.auth.signOut(); window.location.replace(LOGIN_ROUTE); }
-function toggleMobileMenu(show){ els.mobileMenu.hidden=!show; document.body.style.overflow=show?'hidden':''; }
+async function logout(){ await HealerUI.logout(); }
 
 function init(){
-  if(configured() && window.supabase) supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}});
-  els.refreshButton.addEventListener('click',loadDashboard); els.logoutButton.addEventListener('click',logout); els.mobileLogoutButton.addEventListener('click',logout); els.mobileMoreButton.addEventListener('click',()=>toggleMobileMenu(true)); els.closeMobileMenu.addEventListener('click',()=>toggleMobileMenu(false)); els.mobileMenu.addEventListener('click',e=>{if(e.target===els.mobileMenu)toggleMobileMenu(false)}); document.addEventListener('keydown',e=>{if(e.key==='Escape')toggleMobileMenu(false)});
+  if(configured() && window.supabase) supabaseClient=window.HealerUI.client(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}});
+  els.refreshButton.addEventListener('click',loadDashboard); els.logoutButton.addEventListener('click',logout);
   loadDashboard();
 }
 document.addEventListener('DOMContentLoaded',init);
