@@ -3,7 +3,7 @@
 const SUPABASE_URL='https://gtmngtweohixfeajljik.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF';
 const configured=!SUPABASE_URL.startsWith('YOUR_')&&!SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
-const supabase=configured?window.HealerUI.client(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}):null;
+const healerDb=configured?window.HealerUI.client(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}):null;
 const PAGE_SIZE=20;
 const state={page:1,search:'',status:'',level:'',order:'priority_desc',total:0};
 const $=selector=>document.querySelector(selector);
@@ -16,11 +16,11 @@ function setStatus(type,message){
 
 async function authorize(){
   if(!configured){setStatus('empty','Configure o Supabase para carregar as Progressões.');return false;}
-  const {data:{session}}=await supabase.auth.getSession();
+  const {data:{session}}=await healerDb.auth.getSession();
   if(!session){location.href='/healer/login/';return false;}
-  const {data:profile,error}=await supabase.from('profiles').select('role,account_status').eq('id',session.user.id).single();
+  const {data:profile,error}=await healerDb.from('profiles').select('role,account_status').eq('id',session.user.id).single();
   if(error||!profile||!['healer','admin'].includes(profile.role)||profile.account_status!=='active'){
-    await supabase.auth.signOut();location.href='/healer/login/';return false;
+    await healerDb.auth.signOut();location.href='/healer/login/';return false;
   }
   return true;
 }
@@ -28,7 +28,7 @@ async function authorize(){
 async function load(){
   setStatus('loading','Carregando Jornadas...');
   if(!(await authorize()))return;
-  const {data,error}=await supabase.rpc('get_healer_progressions',{p_search:state.search||null,p_status:state.status||null,p_level:state.level?Number(state.level):null,p_page:state.page,p_page_size:PAGE_SIZE,p_order:state.order});
+  const {data,error}=await healerDb.rpc('get_healer_progressions',{p_search:state.search||null,p_status:state.status||null,p_level:state.level?Number(state.level):null,p_page:state.page,p_page_size:PAGE_SIZE,p_order:state.order});
   if(error){console.error(error);setStatus('error','Não foi possível carregar as Progressões agora.');return;}
   $('#statusRegion').innerHTML='';
   const rows=data?.items||[];

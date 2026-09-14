@@ -3,16 +3,16 @@
 const SUPABASE_URL='https://gtmngtweohixfeajljik.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_MDNyO5yGhyYJz23QZS-CGw_b0ymShkF';
 const configured=!SUPABASE_URL.startsWith('YOUR_')&&!SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
-const supabase=configured?window.HealerUI.client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}):null;
+const healerDb=configured?window.HealerUI.client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}}):null;
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const labels={preparation:'Preparação',combat:'Combate',improvement:'Aprimoramento',conclusion:'Conclusão',gym:'Academia',home:'Casa',alpha:'Alpha',bravo:'Bravo',charlie:'Charlie',draft:'Rascunho',available:'Disponível',archived:'Arquivada'};
 function status(type,msg){$('#statusRegion').innerHTML=`<div class="${type}"><strong>${esc(msg)}</strong></div>`}
 async function authorize(){
   if(!configured){status('empty','Configure o Supabase para visualizar a Missão.');return false}
-  const {data:{session}}=await supabase.auth.getSession();
+  const {data:{session}}=await healerDb.auth.getSession();
   if(!session){location.href='/healer/login/';return false}
-  const {data:p,error}=await supabase.from('profiles').select('role,account_status').eq('id',session.user.id).single();
+  const {data:p,error}=await healerDb.from('profiles').select('role,account_status').eq('id',session.user.id).single();
   if(error||!p||!['healer','admin'].includes(p.role)||p.account_status!=='active'){location.href='/healer/login/';return false}
   return true
 }
@@ -21,7 +21,7 @@ async function load(){
   if(!(await authorize()))return;
   const id=new URLSearchParams(location.search).get('mission_id');
   if(!id){status('error','Missão não informada.');return}
-  const {data,error}=await supabase.rpc('get_mission_editor_detail',{p_mission_id:id});
+  const {data,error}=await healerDb.rpc('get_mission_editor_detail',{p_mission_id:id});
   if(error||!data){console.error(error);status('error','Não foi possível carregar esta Missão.');return}
   $('#statusRegion').innerHTML='';
   render(data)

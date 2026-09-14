@@ -9,7 +9,7 @@ const configured =
   !SUPABASE_URL.startsWith('YOUR_') &&
   !SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
 
-const supabase = configured
+const healerDb = configured
   ? window.HealerUI.client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}})
   : null;
 
@@ -70,14 +70,14 @@ async function authorize() {
     return false;
   }
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await healerDb.auth.getSession();
 
   if (!session) {
     window.location.href = '/healer/login/';
     return false;
   }
 
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await healerDb
     .from('profiles')
     .select('role,account_status')
     .eq('id', session.user.id)
@@ -90,7 +90,7 @@ async function authorize() {
     profile.account_status === 'active';
 
   if (!authorized) {
-    await supabase.auth.signOut();
+    await healerDb.auth.signOut();
     window.location.href = '/healer/login/';
     return false;
   }
@@ -103,7 +103,7 @@ async function loadExercises() {
 
   if (!(await authorize())) return;
 
-  const { data, error } = await supabase.rpc('get_healer_exercises', {
+  const { data, error } = await healerDb.rpc('get_healer_exercises', {
     p_search: state.search || null,
     p_environment: state.environment || null,
     p_status: state.status || null,
@@ -266,7 +266,7 @@ async function openExercise(id) {
   openDrawer();
   $('#drawerTitle').textContent = 'Carregando exercício...';
 
-  const { data, error } = await supabase
+  const { data, error } = await healerDb
     .from('exercises')
     .select('*')
     .eq('id', id)
@@ -356,7 +356,7 @@ async function saveExercise(event) {
     return;
   }
 
-  const { data, error } = await supabase.rpc('save_exercise', {
+  const { data, error } = await healerDb.rpc('save_exercise', {
     p_exercise: payload,
   });
 
@@ -379,7 +379,7 @@ async function duplicateExercise() {
   payload.name = `${payload.name} — cópia`;
   payload.status = 'draft';
 
-  const { error } = await supabase.rpc('save_exercise', {
+  const { error } = await healerDb.rpc('save_exercise', {
     p_exercise: payload,
   });
 
@@ -400,7 +400,7 @@ async function archiveOrRestoreExercise() {
   const isArchived = state.currentExercise.status === 'archived';
   const rpcName = isArchived ? 'restore_exercise' : 'archive_exercise';
 
-  const { error } = await supabase.rpc(rpcName, {
+  const { error } = await healerDb.rpc(rpcName, {
     p_exercise_id: state.currentExercise.id,
   });
 

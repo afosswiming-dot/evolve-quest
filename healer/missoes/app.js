@@ -9,7 +9,7 @@ const configured =
   !SUPABASE_URL.startsWith('YOUR_') &&
   !SUPABASE_PUBLISHABLE_KEY.startsWith('YOUR_');
 
-const supabase = configured
+const healerDb = configured
   ? window.HealerUI.client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'evolve-quest-healer-auth'}})
   : null;
 
@@ -71,14 +71,14 @@ async function authorize() {
     return false;
   }
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await healerDb.auth.getSession();
 
   if (!session) {
     location.href = '/healer/login/';
     return false;
   }
 
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await healerDb
     .from('profiles')
     .select('role,account_status')
     .eq('id', session.user.id)
@@ -91,7 +91,7 @@ async function authorize() {
     profile.account_status === 'active';
 
   if (!authorized) {
-    await supabase.auth.signOut();
+    await healerDb.auth.signOut();
     location.href = '/healer/login/';
     return false;
   }
@@ -102,7 +102,7 @@ async function authorize() {
 async function loadCatalogs() {
   if (!configured) return;
 
-  const { data: chapters } = await supabase
+  const { data: chapters } = await healerDb
     .from('chapters')
     .select('id,title,chapter_number,level_number,status')
     .neq('status', 'archived')
@@ -125,7 +125,7 @@ async function loadMissions() {
 
   if (!(await authorize())) return;
 
-  const { data, error } = await supabase.rpc('get_healer_missions', {
+  const { data, error } = await healerDb.rpc('get_healer_missions', {
     p_search: state.search || null,
     p_code: state.code || null,
     p_environment: state.environment || null,
@@ -271,7 +271,7 @@ async function openMission(id) {
   openDrawer();
   $('#drawerTitle').textContent = 'Carregando Missão...';
 
-  const { data, error } = await supabase.rpc('get_mission_editor_detail', {
+  const { data, error } = await healerDb.rpc('get_mission_editor_detail', {
     p_mission_id: id,
   });
 
@@ -460,7 +460,7 @@ function closeExerciseModal() {
 async function loadExerciseLibrary() {
   $('#exerciseModalStatus').innerHTML = '<div class="loading"><strong>Carregando exercícios...</strong></div>';
 
-  const { data, error } = await supabase.rpc('get_healer_exercises', {
+  const { data, error } = await healerDb.rpc('get_healer_exercises', {
     p_search: state.librarySearch || null,
     p_environment: $('#environmentInput').value,
     p_status: 'active',
@@ -596,7 +596,7 @@ async function saveDraft() {
     return;
   }
 
-  const { data, error } = await supabase.rpc('save_mission_draft', {
+  const { data, error } = await healerDb.rpc('save_mission_draft', {
     p_mission: payload.mission,
     p_exercises: payload.exercises,
   });
@@ -621,7 +621,7 @@ async function publishMission() {
     return;
   }
 
-  const { data: saved, error: saveError } = await supabase.rpc('save_mission_draft', {
+  const { data: saved, error: saveError } = await healerDb.rpc('save_mission_draft', {
     p_mission: { ...payload.mission, status: 'draft' },
     p_exercises: payload.exercises,
   });
@@ -634,7 +634,7 @@ async function publishMission() {
 
   const missionId = saved?.mission_id || payload.mission.id;
 
-  const { error: publishError } = await supabase.rpc('publish_mission', {
+  const { error: publishError } = await healerDb.rpc('publish_mission', {
     p_mission_id: missionId,
   });
 
@@ -655,7 +655,7 @@ async function duplicateMissionDirect(id) {
   const targetEnvironment = destination.environment;
   const targetChapterId = destination.chapter;
 
-  const { error } = await supabase.rpc('duplicate_mission', {
+  const { error } = await healerDb.rpc('duplicate_mission', {
     p_mission_id: id,
     p_target_environment: targetEnvironment,
     p_target_chapter_id: targetChapterId || null,
@@ -686,7 +686,7 @@ async function archiveOrRestoreCurrentMission() {
     return;
   }
 
-  const { error } = await supabase.rpc('archive_mission', {
+  const { error } = await healerDb.rpc('archive_mission', {
     p_mission_id: state.currentMission.id,
   });
 
@@ -825,7 +825,7 @@ $('#openPreviewButton').addEventListener('click', async () => {
       return;
     }
 
-    const { data, error } = await supabase.rpc('save_mission_draft', {
+    const { data, error } = await healerDb.rpc('save_mission_draft', {
       p_mission: { ...payload.mission, status: 'draft' },
       p_exercises: payload.exercises,
     });
@@ -838,7 +838,7 @@ $('#openPreviewButton').addEventListener('click', async () => {
 
     missionId = data?.mission_id;
   } else {
-    const { error } = await supabase.rpc('save_mission_draft', {
+    const { error } = await healerDb.rpc('save_mission_draft', {
       p_mission: payload.mission,
       p_exercises: payload.exercises,
     });
