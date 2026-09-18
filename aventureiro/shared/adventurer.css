@@ -1,0 +1,72 @@
+/* Shared presentation only. Authentication and product rules remain page-owned. */
+:root{--eq-purple:#321747;--eq-paper:#f7f5f8;--eq-ink:#1d1822;--eq-muted:#655d6c;--eq-line:#e2dce7;--eq-gold:#986d22;--purple-950:#21102f;--purple-900:#321747;--purple-800:#43205e;--purple-700:#583074;--purple:#321747;--purple-2:#583074;--ink:#1d1822;--muted:#655d6c;--paper:#f7f5f8;--line:#e2dce7;--radius-lg:20px;--radius-md:14px;--shadow:0 8px 28px rgba(33,16,47,.06)}
+html{background:var(--eq-paper);scroll-padding-bottom:110px}
+body.eq-adventurer{margin:0;min-width:0;background:var(--eq-paper);color:var(--eq-ink);font-family:Inter,system-ui,sans-serif;line-height:1.55}
+.eq-adventurer *{box-sizing:border-box}
+.eq-adventurer [hidden]{display:none!important}
+.eq-adventurer :is(main,section,article,fieldset,form,.content,.card-top>div){min-width:0}
+.eq-adventurer :is(h1,h2,h3,p,strong,legend){overflow-wrap:anywhere}
+.eq-adventurer h1{font-family:Inter,system-ui,sans-serif;font-size:clamp(1.75rem,6vw,2.4rem);line-height:1.18;letter-spacing:-.035em;color:var(--eq-purple)}
+.eq-adventurer h2{font-family:Inter,system-ui,sans-serif;font-size:1.25rem;line-height:1.3;letter-spacing:-.02em}
+.eq-adventurer h3{font-size:1.1rem;line-height:1.35}
+.eq-adventurer :is(.lead,.intro,.body-copy){font-size:1rem;line-height:1.65;color:var(--eq-muted)}
+.eq-adventurer .app-shell{background:transparent;box-shadow:none;backdrop-filter:none}
+.eq-adventurer .topbar{background:var(--eq-paper);border-color:var(--eq-line);box-shadow:none}
+.eq-adventurer :is(.card,.mission-card,.summary-card,.chapter-hero,.phase-card,.question-card,.portal-card,.checkpoint-card,.hero-card,.welcome-card,.intro-panel,.mission-summary){border:1px solid var(--eq-line);border-radius:20px;background:#fff;box-shadow:var(--shadow)}
+.eq-adventurer :is(.mission-card,.chapter-hero,.phase-card,.question-card,.portal-card,.checkpoint-card){padding:20px}
+.eq-adventurer :is(.mission-card__ornament,.ornament){display:none}
+.eq-adventurer :is(button,.button,.primary-button,.secondary-button,.checkpoint-link){min-height:48px;font:600 .95rem/1.4 Inter,system-ui,sans-serif;border-radius:12px;touch-action:manipulation}
+.eq-adventurer :is(.primary-button,.button.primary,#refresh){background:var(--eq-purple);color:#fff;border:1px solid var(--eq-purple);box-shadow:none}
+.eq-adventurer :is(.secondary-button,.button.secondary){background:#fff;color:var(--eq-purple);border:1px solid var(--eq-line);box-shadow:none}
+.eq-adventurer :is(.text-button,.ghost-button){color:var(--eq-purple);background:transparent}
+.eq-adventurer .danger-button{background:#a12d40;color:#fff}
+.eq-adventurer :is(button,a,input,textarea,select):focus-visible{outline:3px solid #765194;outline-offset:3px}
+.eq-adventurer label:has(input:focus-visible){outline:3px solid #765194;outline-offset:3px;border-radius:12px}
+.eq-adventurer :is(button,.button):disabled{opacity:.5;cursor:not-allowed;transform:none}
+.eq-adventurer :is(input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea,select){max-width:100%;font:inherit;font-size:16px;border:1px solid var(--eq-line);border-radius:12px;background:#fff;color:var(--eq-ink);padding:13px;min-height:48px}
+.eq-adventurer input{accent-color:var(--eq-purple)}
+.eq-adventurer :is(.status-badge,.summary-pill,.mini-chip){border-radius:999px;padding:6px 10px;font-size:.75rem;font-weight:600;line-height:1.4}
+.eq-adventurer .status-badge.available{color:#43205e;background:#f0eaf5;border-color:#d8cbe3}
+.eq-adventurer .status-badge.completed{color:#23583b;background:#edf6ef}
+.eq-adventurer .status-badge.locked{color:#655d6c;background:#f0edf2}
+.eq-adventurer :is(.xp-chip,.seal){color:var(--eq-gold);background:#faf4e6}
+.eq-adventurer :is(.progress-bar,.progress-fill,.progress>span){background:var(--eq-purple)}
+.eq-adventurer :is(.loading-card,.status,.empty-state,.error-state){border-radius:16px;padding:24px;background:#fff;border:1px solid var(--eq-line);color:var(--eq-muted);line-height:1.6}
+.eq-adventurer .toast{max-width:calc(100vw - 32px);bottom:calc(94px + env(safe-area-inset-bottom));border-radius:12px;background:var(--eq-purple);color:#fff;font-size:.9rem;z-index:100}
+.eq-adventurer.eq-has-nav{padding-bottom:calc(94px + env(safe-area-inset-bottom))}
+.eq-adventurer .eq-nav{position:fixed;z-index:40;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,760px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:#fff;border:1px solid var(--eq-line);border-radius:20px 20px 0 0;box-shadow:0 -4px 24px #21102f08}
+.eq-adventurer .eq-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;padding:6px 2px;width:auto;border:0;border-radius:12px;text-decoration:none;color:var(--eq-muted);background:transparent;font:600 .7rem/1.4 Inter,system-ui,sans-serif}
+.eq-adventurer .eq-nav a[aria-current=page]{color:var(--eq-purple);background:#f0eaf5}
+.eq-nav .eq-nav-icon{font-size:20px;line-height:24px}
+.eq-skip{position:fixed;top:-100px;left:16px;z-index:200;background:#fff;color:var(--eq-purple);padding:12px}
+.eq-skip:focus{top:8px}
+.eq-adventurer .eq-header{width:min(100%,760px);margin:0 auto 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--eq-line);padding:16px 0;color:var(--eq-purple)}
+.eq-adventurer .eq-header a{background:none;color:inherit;width:auto;padding:10px;text-decoration:none}
+.eq-adventurer[data-eq-page=progressao],.eq-adventurer[data-eq-page=feedback-evolucao]{display:block;padding:20px 20px 110px}
+.eq-adventurer[data-stage] main{margin:40px auto;width:min(100%,640px);padding:24px;border-radius:20px;box-shadow:var(--shadow)}
+.eq-adventurer[data-eq-page=missoes] .mission-controls{position:static;margin:24px 0;gap:12px}
+.eq-adventurer .exercise{border-top:1px solid var(--eq-line);padding:20px 0}
+.eq-adventurer .exercise-name{font-size:1.1rem;line-height:1.4}
+.eq-adventurer .exercise-data{gap:8px}
+.eq-adventurer .data-cell{background:var(--eq-paper);border-radius:12px;padding:12px 8px}
+.eq-adventurer .data-cell strong{font-size:1.15rem;color:var(--eq-purple)}
+.eq-adventurer .exercise-check{min-height:52px;padding:12px;background:#f0eaf5;border-radius:12px;display:flex;align-items:center;gap:12px}
+.eq-adventurer .exercise-check input{width:22px;height:22px;flex-shrink:0}
+.eq-adventurer .healer-note{background:var(--eq-paper);color:var(--eq-muted);padding:14px;border-radius:12px;line-height:1.6}
+@media(max-width:600px){.eq-adventurer .content{padding-left:18px;padding-right:18px}.eq-adventurer .card-top{flex-wrap:wrap;gap:12px}.eq-adventurer .summary-grid{grid-template-columns:1fr;gap:12px}.eq-adventurer .summary-grid>article{border:0;border-top:1px solid var(--eq-line);padding:12px 0}.eq-adventurer .mission-controls{grid-template-columns:1fr}.eq-adventurer :is(.section-heading,.summary-heading){flex-wrap:wrap;gap:12px}.eq-adventurer .environment-tab{padding:12px 10px}.eq-adventurer .version{display:none}}
+@media(prefers-reduced-motion:reduce){.eq-adventurer *, .eq-adventurer *::before,.eq-adventurer *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Neutral surfaces must also reset the original dark-card foregrounds. */
+.eq-adventurer .mission-card{color:var(--eq-ink)}
+.eq-adventurer .mission-card::after{display:none}
+.eq-adventurer .mission-card h2{color:var(--eq-purple);margin:20px 0 12px}
+.eq-adventurer .mission-objective{color:var(--eq-muted)}
+.eq-adventurer :is(.eyebrow,.section-kicker,.mission-card .section-kicker){color:var(--eq-purple)}
+.eq-adventurer .duration{color:var(--eq-purple);background:#f0eaf5;border-color:var(--eq-line);white-space:normal}
+.eq-adventurer .mission-card__heading{flex-wrap:wrap}
+.eq-adventurer .summary-grid{padding:0 18px}
+.eq-adventurer .healer-note{border-color:var(--eq-line)}
+.eq-adventurer .exercise-media:not(a){min-height:72px;height:72px;background:#eee9f2;color:var(--eq-purple)}
+.eq-adventurer .exercise-media:not(a)::after{content:'Demonstração indisponível';font:500 .8rem Inter,system-ui,sans-serif;margin-left:10px}
+.eq-adventurer .exercise-media:not(a) svg{display:none}
+.eq-adventurer .mission-controls{background:transparent;padding:0;width:100%;transform:none}
+.eq-adventurer a.shortcut{text-decoration:none;font:inherit;color:var(--eq-ink)}

@@ -9,8 +9,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="/aventureiro/shared/adventurer.css">
+<script src="/aventureiro/shared/adventurer.js" defer></script>
 </head>
-<body>
+<body class="eq-adventurer" data-eq-page="jornada">
 <div class="app-shell">
 <header class="topbar">
   <div class="brand">EVOLVE Quest</div>
@@ -83,7 +85,8 @@
       <div>
         <p class="eyebrow">Próximo Portal</p>
         <h2>Checkpoint</h2>
-        <p class="lead" id="checkpointText">Seu Checkpoint será liberado ao final do ciclo de quatro semanas.</p>
+        <p class="lead" id="checkpointText">Seu primeiro Checkpoint será liberado 15 dias após sua primeira Missão concluída.</p>
+        <a class="checkpoint-link" href="/checkpoint/">Ver meu Checkpoint</a>
       </div>
     </section>
   </div>

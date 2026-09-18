@@ -4,6 +4,7 @@ supabase/
 scripts/
 *.md
 *.pdf
+!assets/manual/manual-oficial-aventureiro.pdf
 *.zip
 Imagem do Codex*.png
 Slide *

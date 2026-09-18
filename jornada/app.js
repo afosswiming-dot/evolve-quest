@@ -16,7 +16,7 @@ const date=v=>v?new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'short'}).f
     render(data||{});
   }catch(error){
     console.error('[EVOLVE Jornada]',error);
-    $('status').innerHTML='<strong>Não foi possível carregar sua Jornada.</strong><br>Tente novamente em alguns instantes.';
+    $('status').innerHTML='<strong>Não foi possível carregar sua Jornada.</strong><br><button class="secondary-button" data-eq-retry type="button">Tentar novamente</button>';
   }
 })();
 function render(data){
@@ -84,9 +84,9 @@ function renderRecords(items){
 }
 function renderCheckpoint(cp,progress){
   if(!cp){
-    $('checkpointText').textContent=progress>=100?'Seu ciclo está completo. Aguarde a liberação do Checkpoint.':'Seu Checkpoint será liberado ao final do ciclo de quatro semanas.';
+    $('checkpointText').textContent='Seu primeiro Checkpoint será liberado 15 dias após sua primeira Missão concluída.';
     return;
   }
-  const labels={available:'Seu Checkpoint está disponível.',in_progress:'Seu Checkpoint está em andamento.',completed:'Checkpoint concluído. Sua evolução está pronta para análise.'};
+  const labels={locked:`Seu Checkpoint está previsto para ${cp.availableAt?date(cp.availableAt):'15 dias após a primeira Missão concluída'}.`,available:'Seu Checkpoint está disponível.',in_progress:'Seu Checkpoint está em andamento.',submitted:'Checkpoint enviado. Aguarde a análise do Healer.',completed:'Checkpoint concluído. Sua evolução está pronta para análise.'};
   $('checkpointText').textContent=labels[cp.status]||'Acompanhe aqui o próximo Checkpoint da Jornada.';
 }

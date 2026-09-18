@@ -102,7 +102,7 @@ function buildMission(raw, assignment, exerciseRows, execution) {
   return {
     id: raw.id,
     assignmentId: assignment.id,
-    code: `Missão ${raw.mission_type}`,
+    code: raw.mission_type || raw.code ? `Missão ${raw.mission_type || raw.code}` : 'Missão',
     missionCode: String(raw.code || raw.mission_type || '').toLowerCase(),
     name: raw.subtitle || raw.name,
     title: raw.name,
@@ -227,7 +227,7 @@ async function initialize() {
     await loadMissionData();
   } catch (error) {
     console.error('EVOLVE Missões:', error);
-    state.error = error.message || 'Não foi possível carregar suas Missões.';
+    state.error = 'Não foi possível carregar suas Missões. Tente novamente.';
   } finally {
     state.loading = false;
     render();
@@ -466,7 +466,9 @@ async function pauseOrResumeMission() {
   }
 }
 
+let finishingMission = false;
 async function finishMission() {
+  if (finishingMission) return;
   const mission = activeMission();
   if (!mission || !state.activeExecution) return;
   const allIds = mission.phases.flatMap(
@@ -477,17 +479,11 @@ const pendingExercises = allIds.filter(
   id => !state.completedExercises.has(id)
 );
 
-if (pendingExercises.length > 0) {
-  const confirmed = window.confirm(
-    `Você ainda possui ${pendingExercises.length} exercício${
-      pendingExercises.length > 1 ? 's' : ''
-    } não concluído${
-      pendingExercises.length > 1 ? 's' : ''
-    }.\n\nDeseja encerrar a missão mesmo assim?`
-  );
-
+const confirmed = window.confirm(pendingExercises.length
+    ? 'Finalizar esta Missão?\n\nVocê ainda possui ' + pendingExercises.length + ' exercício(s) não concluído(s). O próximo passo será registrar como foi o treino.'
+    : 'Finalizar esta Missão?\n\nO próximo passo será registrar como foi o treino.');
   if (!confirmed) return;
-}  
+  finishingMission = true;
   setControlLoading(true);
   try {
     const now = new Date().toISOString();
@@ -509,8 +505,9 @@ if (pendingExercises.length > 0) {
   } catch (error) {
     console.error('EVOLVE finalizar:', error);
     showToast('Não foi possível finalizar a Missão agora.');
+    finishingMission = false;
   } finally {
-    setControlLoading(false);
+    if (!finishingMission) setControlLoading(false);
   }
 }
 

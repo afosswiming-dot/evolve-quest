@@ -8,7 +8,6 @@
       login: '/login/',
       missions: '/missoes/',
       missionRecord: '/registro-missao/',
-      manual: '/manual/',
       journey: '/jornada/',
       checkpoint: '/checkpoint/',
       records: '/registros/',
@@ -242,9 +241,8 @@
       const pending = state.records.find(record => record.status === 'completed' && !record.submitted_at);
       return pending ? navigate(CONFIG.routes.missionRecord, { assignment: pending.mission_assignment_id }) : showToast('Nenhum Registro da Missão está pendente.');
     }
-    if (action === 'manual') return navigate(CONFIG.routes.manual, { level: state.journey?.current_level || state.profile?.current_level });
     if (action === 'scroll') return navigate(CONFIG.routes.journey, { journey: state.journey?.id });
-    if (action === 'checkpoint') return state.checkpoint ? navigate(CONFIG.routes.checkpoint, { checkpoint: state.checkpoint.id }) : showToast('Nenhum Checkpoint está disponível.');
+    if (action === 'checkpoint') return navigate(CONFIG.routes.checkpoint, state.checkpoint ? { checkpoint: state.checkpoint.id } : {});
     if (action === 'healer') {
       if (state.healer?.contact_url) return window.location.assign(state.healer.contact_url);
       if (state.healer?.whatsapp_number) return window.location.assign(`https://wa.me/${state.healer.whatsapp_number.replace(/\D/g,'')}`);
