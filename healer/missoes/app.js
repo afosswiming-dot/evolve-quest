@@ -825,29 +825,35 @@ $('#openPreviewButton').addEventListener('click', async () => {
       return;
     }
 
-    const { data, error } = await healerDb.rpc('save_mission_draft', {
-      p_mission: { ...payload.mission, status: 'draft' },
-      p_exercises: payload.exercises,
-    });
+    const previewTab = window.open('about:blank', '_blank');
+    if (previewTab) previewTab.opener = null;
+    let data, error;
+    try {
+      ({ data, error } = await healerDb.rpc('save_mission_draft', {
+        p_mission: { ...payload.mission, status: 'draft' },
+        p_exercises: payload.exercises,
+      }));
+    } catch (connectionError) {
+      previewTab?.close();
+      HealerUI.toast('Não foi possível salvar o rascunho. Verifique sua conexão.');
+      return;
+    }
 
     if (error) {
       console.error(error);
+      previewTab?.close();
       HealerUI.toast('Não foi possível salvar o rascunho para pré-visualização.');
       return;
     }
 
     missionId = data?.mission_id;
-  } else {
-    const { error } = await healerDb.rpc('save_mission_draft', {
-      p_mission: payload.mission,
-      p_exercises: payload.exercises,
-    });
-
-    if (error) {
-      console.error(error);
-      HealerUI.toast('Não foi possível atualizar o rascunho para pré-visualização.');
-      return;
-    }
+    if (missionId) {
+      $('#missionId').value = missionId;
+      if (previewTab) {
+        previewTab.location.href = `/healer/missoes/detalhe/?mission_id=${encodeURIComponent(missionId)}`;
+        return;
+      }
+    } else previewTab?.close();
   }
 
   if (!missionId) {

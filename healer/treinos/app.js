@@ -33,6 +33,20 @@ let current = null;
 let currentMissionId = null;
 let composition = [];
 let library = [];
+let templates = [];
+let editorRevision = 0;
+let saving = false;
+let loadingMission = false;
+let pendingSaveRequest = null;
+
+function newSaveRequestId() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 15) | 64;
+  bytes[8] = (bytes[8] & 63) | 128;
+  const hex = [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
 
 
 /* =========================================================
@@ -338,8 +352,13 @@ function getA(id) {
 ========================================================= */
 
 function reset() {
+  pendingSaveRequest = null;
+  editorRevision++;
+  loadingMission = false;
   currentMissionId = null;
   composition = [];
+  $('#templateSelect').value = '';
+  $('#saveMission').disabled = false;
 
   $('#missionName').value = 'Missão Alpha';
   $('#missionType').value = 'alpha';
@@ -357,6 +376,7 @@ function reset() {
 ========================================================= */
 
 function openNew(id) {
+  if (saving) return;
   current = getA(id);
 
   reset();
@@ -368,6 +388,7 @@ function openNew(id) {
     current.preferredName || current.fullName;
 
   $('#editor').classList.add('open');
+  loadTemplates();
 }
 
 
@@ -376,11 +397,15 @@ function openNew(id) {
 ========================================================= */
 
 async function openEdit(aid, mid) {
+  if (saving) return;
   current = getA(aid);
 
   reset();
 
   currentMissionId = mid;
+  const revision = editorRevision;
+  loadingMission = true;
+  $('#saveMission').disabled = true;
 
   $('#editorTitle').textContent =
     'Editar Missão';
@@ -390,20 +415,22 @@ async function openEdit(aid, mid) {
 
   $('#editor').classList.add('open');
 
-  const { data, error } = await db.rpc(
-    'get_personalized_mission_editor',
-    {
+  try {
+    const { data, error } = await db.rpc('get_personalized_mission_editor', {
       p_mission_id: mid
-    }
-  );
-
-  if (error || !data) {
-    console.error(error);
-    HealerUI.toast('Não foi possível carregar o treino.');
-    return;
+    });
+    if (revision !== editorRevision) return;
+    if (error || !data?.mission) throw error || new Error('Treino indisponível.');
+    loadingMission = false;
+    $('#saveMission').disabled = false;
+    applyMissionData(data, false);
+    loadTemplates();
+  } catch (error) {
+    if (revision !== editorRevision) return;
+    loadingMission = false;
+    $('#saveMission').disabled = true;
+    HealerUI.toast(error?.message || 'Não foi possível carregar o treino. Verifique sua conexão.');
   }
-
-  applyMissionData(data, false);
 }
 
 
@@ -415,7 +442,8 @@ function applyMissionData(data, isTemplate) {
   const m = data.mission || {};
 
   if (isTemplate) {
-    currentMissionId = m.id || null;
+    // Loading a catalogue entry always creates a new individual mission.
+    currentMissionId = null;
   }
 
   $('#missionName').value =
@@ -436,7 +464,7 @@ function applyMissionData(data, isTemplate) {
   $('#missionObjective').value =
     m.objective || '';
 
-  composition = (data.exercises || []).map(x => ({
+  composition = [...(data.exercises || [])].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)).map(x => ({
     exercise_id: x.exercise_id,
     name: x.exercise_name,
     section: x.section || 'combat',
@@ -444,7 +472,9 @@ function applyMissionData(data, isTemplate) {
     repetitions: x.repetitions || '',
     duration_seconds: x.duration_seconds,
     rest_seconds: x.rest_seconds ?? 0,
-    healer_note: x.healer_note || ''
+    healer_note: x.healer_note || '',
+    alternative_exercise_id: x.alternative_exercise_id || null,
+    alternative_exercise_name: x.alternative_exercise_name || ''
   }));
 
   renderComp();
@@ -455,77 +485,75 @@ function applyMissionData(data, isTemplate) {
    CARREGAR MODELO ALPHA / BRAVO / CHARLIE
 ========================================================= */
 
-async function loadTemplate() {
-  if (!current) return;
-
-  const code =
-    $('#missionType').value;
-
-  const env =
-    $('#missionEnvironment').value;
-
-  const {
-    data: templates,
-    error
-  } = await db
-    .from('missions')
-    .select(
-      'id,name,code,environment,chapter_id,created_by'
-    )
-    .eq('code', code)
-    .eq('environment', env)
-    .eq('status', 'available')
-    .is('created_by', null)
-    .limit(10);
-
-  if (error) {
-    console.error(error);
-    HealerUI.toast(
-      'Não foi possível localizar o modelo oficial.'
-    );
-    return;
-  }
-
-  let template =
-    (templates || []).find(
-      x => x.chapter_id === current.chapterId
-    ) ||
-    (templates || [])[0];
-
-  if (!template) {
-    HealerUI.toast(
-      'Ainda não existe um modelo oficial para esta combinação.'
-    );
-    return;
-  }
-
-  const {
-    data,
-    error: detailError
-  } = await db.rpc(
-    'get_personalized_mission_editor',
-    {
-      p_mission_id: template.id
+async function loadTemplates() {
+  const revision = editorRevision;
+  $('#templateStatus').textContent = 'Carregando modelos...';
+  $('#loadTemplate').disabled = true;
+  try {
+    const items = [];
+    // Paginate rather than silently omitting models beyond the first page.
+    for (let page = 0; ; page++) {
+      const { data, error } = await db.from('missions')
+        .select('id,name,code,environment,chapter_id,status,chapters(title)')
+        .is('created_by', null).in('status', ['available', 'draft'])
+        .order('name').order('id').range(page * 100, page * 100 + 99);
+      if (error) throw error;
+      items.push(...(data || []));
+      if ((data || []).length < 100) break;
     }
-  );
-
-  if (detailError || !data) {
-    console.error(detailError);
-    HealerUI.toast(
-      'Não foi possível carregar o modelo.'
-    );
-    return;
+    if (revision !== editorRevision) return;
+    templates = items;
+    renderTemplates();
+  } catch (error) {
+    if (revision !== editorRevision) return;
+    templates = [];
+    renderTemplates();
+    $('#templateStatus').textContent = 'Não foi possível carregar os modelos. Verifique sua conexão e permissão e tente novamente.';
+    console.error(error);
   }
-
-  applyMissionData(data, true);
-
-  $('#editorTitle').textContent =
-    `Modelo ${code.toUpperCase()} — personalize para ${
-      current.preferredName ||
-      current.fullName
-    }`;
 }
 
+function renderTemplates() {
+  const selected = $('#templateSelect').value;
+  const search = $('#templateSearch').value.trim().toLocaleLowerCase('pt-BR');
+  const status = $('#templateStatusFilter').value;
+  const environment = $('#templateEnvironment').value;
+  const matches = templates.filter(m => (!status || m.status === status) &&
+    (!environment || m.environment === environment) &&
+    [m.name, m.code, m.chapters?.title].join(' ').toLocaleLowerCase('pt-BR').includes(search));
+  $('#templateSelect').innerHTML = '<option value="">Selecione um modelo</option>' + matches.map(m =>
+    `<option value="${esc(m.id)}">${esc(m.name)} · ${esc((m.code || '').toUpperCase())} · ${esc(m.environment === 'home' ? 'Casa' : 'Academia')} · ${esc(m.chapters?.title || 'Sem capítulo')} · ${m.status === 'draft' ? 'Rascunho' : 'Publicado'}</option>`).join('');
+  if (matches.some(m => m.id === selected)) $('#templateSelect').value = selected;
+  $('#templateStatus').textContent = `${matches.length} modelos encontrados. Carregar não atribui o treino; salve após personalizar.`;
+  $('#loadTemplate').disabled = !$('#templateSelect').value;
+}
+
+async function loadTemplate() {
+  if (!current || saving || loadingMission) return;
+  const template = templates.find(m => m.id === $('#templateSelect').value);
+  if (!template) return;
+  if (composition.length && !(await HealerUI.confirm('Substituir a composição atual pelo modelo selecionado?'))) return;
+  const revision = editorRevision;
+  loadingMission = true;
+  $('#loadTemplate').disabled = true;
+  $('#saveMission').disabled = true;
+  try {
+    const { data, error } = await db.rpc('get_mission_editor_detail', { p_mission_id: template.id });
+    if (revision !== editorRevision) return;
+    if (error || !data?.mission || !data.exercises?.length) throw error || new Error('Modelo sem exercícios ou indisponível.');
+    applyMissionData(data, true);
+    $('#editorTitle').textContent = `Modelo ${(template.code || '').toUpperCase()} — personalize para ${current.preferredName || current.fullName}`;
+    HealerUI.toast('Modelo carregado. Personalize e salve para atribuir ao Aventureiro.');
+  } catch (error) {
+    if (revision === editorRevision) HealerUI.toast(error?.message || 'Não foi possível carregar o modelo. Verifique sua conexão e permissão.');
+  } finally {
+    if (revision === editorRevision) {
+      loadingMission = false;
+      $('#loadTemplate').disabled = !$('#templateSelect').value;
+      $('#saveMission').disabled = false;
+    }
+  }
+}
 
 /* =========================================================
    COMPOSIÇÃO DO TREINO
@@ -547,7 +575,7 @@ function renderComp() {
           </strong>
 
           <span>
-            ${esc(x.section)}
+            ${esc(x.section)}${x.alternative_exercise_name ? ` · Alternativa: ${esc(x.alternative_exercise_name)}` : ''}
           </span>
 
         </div>
@@ -895,7 +923,7 @@ async function loadLib() {
 ========================================================= */
 
 async function save() {
-  if (!current) return;
+  if (!current || saving || loadingMission) return;
 
 
   if (
@@ -960,65 +988,38 @@ async function save() {
     );
 
 
-  $('#saveMission').disabled =
-    true;
-
-  $('#saveMission').textContent =
-    'Salvando...';
-
-
-  const {
-    data,
-    error
-  } = await db.rpc(
-    'save_personalized_mission',
-    {
-
-      p_adventurer_id:
-        current.id,
-
-      p_mission:
-        mission,
-
-      p_exercises:
-        ex
-    }
-  );
-
-
-  $('#saveMission').disabled =
-    false;
-
-  $('#saveMission').textContent =
-    'Salvar para este Aventureiro';
-
-
-  if (error) {
-
-    console.error(error);
-
-    HealerUI.toast(
-
-      'Não foi possível salvar.'
-    );
-
-    return;
+  const requestPayload = JSON.stringify({ adventurerId: current.id, mission, exercises: ex });
+  if (!pendingSaveRequest || pendingSaveRequest.payload !== requestPayload) {
+    pendingSaveRequest = { payload: requestPayload, id: newSaveRequestId() };
   }
-
-
-  HealerUI.toast(
-    data?.cloned
-      ? 'Missão individual criada e atribuído sem alterar o modelo oficial.'
-      : 'Missão deste Aventureiro atualizada com sucesso.'
-  );
-
-
-  $('#editor')
-    .classList
-    .remove('open');
-
-
-  await load();
+  mission.request_id = pendingSaveRequest.id;
+  saving = true;
+  $('#saveMission').disabled = true;
+  $('#saveMission').textContent = 'Salvando...';
+  // Freeze editor identity until the request finishes.
+  $('#editor').inert = true;
+  try {
+    const { data, error } = await db.rpc('save_personalized_mission', {
+      p_adventurer_id: current.id, p_mission: mission, p_exercises: ex
+    });
+    if (error || !data?.missionId) throw error || new Error('Resposta de salvamento inválida.');
+    currentMissionId = data.missionId;
+    pendingSaveRequest = null;
+    HealerUI.toast(data.cloned
+      ? 'Missão individual criada e atribuída sem alterar o modelo oficial.'
+      : 'Missão deste Aventureiro atualizada com sucesso.');
+    $('#editor').classList.remove('open');
+    editorRevision++;
+    await load();
+  } catch (error) {
+    console.error(error);
+    HealerUI.toast(error?.message || 'Não foi possível salvar. Verifique sua conexão e permissão.');
+  } finally {
+    saving = false;
+    $('#editor').inert = false;
+    $('#saveMission').disabled = false;
+    $('#saveMission').textContent = 'Salvar para este Aventureiro';
+  }
 }
 
 
@@ -1045,8 +1046,12 @@ $('#closeEditor').onclick =
       .remove('open');
 
 
-$('#loadTemplate').onclick =
-  loadTemplate;
+$('#loadTemplate').onclick = loadTemplate;
+$('#templateSearch').oninput = renderTemplates;
+$('#templateStatusFilter').onchange = renderTemplates;
+$('#templateEnvironment').onchange = renderTemplates;
+$('#templateSelect').onchange = () => { $('#loadTemplate').disabled = !$('#templateSelect').value; };
+$('#reloadTemplates').onclick = loadTemplates;
 
 
 $('#missionType').onchange =
